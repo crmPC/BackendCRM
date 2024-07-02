@@ -1,4 +1,4 @@
-package com.backend.crm.routes.user.models;
+package com.backend.crm.routes.DTOs;
 
 import lombok.Data;
 

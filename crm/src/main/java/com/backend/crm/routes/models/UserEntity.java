@@ -1,15 +1,13 @@
-package com.backend.crm.routes.user.models;
+package com.backend.crm.routes.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.sql.Date;
 
 @Data
 @Entity
-public class User {
+public class UserEntity {
     @Id
     private Long id_user;
 
@@ -31,12 +29,13 @@ public class User {
     @Column()
     private String password;
 
-    @Column(nullable = false, columnDefinition = "false")
+    @Column()
     private boolean banned;
 
     @Column()
     private String banReason;
 
     @Column()
+    @Enumerated(EnumType.STRING)
     private UserRole userRole = UserRole.NOT_ACTIVATED;
 }
