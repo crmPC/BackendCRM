@@ -9,6 +9,7 @@ import java.sql.Date;
 @Entity
 public class UserEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_user;
 
     @Column(nullable = false)
@@ -30,7 +31,7 @@ public class UserEntity {
     private String password;
 
     @Column()
-    private boolean banned;
+    private boolean banned = false;
 
     @Column()
     private String banReason;

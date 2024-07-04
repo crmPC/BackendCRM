@@ -21,21 +21,21 @@ public class UserController {
 
     @PostMapping("/signup")
     public Response signup(@RequestBody SignupUserDto userDto){
-        return null;
+        return this.service.signup(userDto);
     }
 
-    @GetMapping()
-    public Response getUser(@RequestBody String Authorization){
-        return null;
-    }
-
-    @PostMapping("/auth")
-    public Response authUser(@RequestBody AuthUserDto userDto){
-        return null;
-    }
-
-    @PostMapping("/ban")
-    public Response banUser(@RequestBody BanUserDto banUserDto){
-        return null;
-    }
+//    @GetMapping()
+//    public Response getUser(@RequestBody String Authorization){
+//        return this.service.getUser();
+//    }
+//
+//    @PostMapping("/auth")
+//    public Response authUser(@RequestBody AuthUserDto userDto){
+//        return this.service.authUser();
+//    }
+//
+//    @PostMapping("/ban")
+//    public Response banUser(@RequestBody BanUserDto banUserDto){
+//        return this.service.banUser();
+//    }
 }

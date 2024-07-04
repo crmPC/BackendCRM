@@ -4,6 +4,7 @@ import com.backend.crm.routes.models.UserEntity;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -16,8 +17,8 @@ public class TokenService {
     @Value("${app.jwtExpirationInHr}")
     private int jwtExpirationInHr;
 
-    public String generateToken(Authentication authentication) {
-        UserEntity userPrincipal = (UserEntity) authentication.getPrincipal();
+    public String generateToken(UserEntity userPrincipal) {
+//        UserEntity userPrincipal = (UserEntity) authentication.getPrincipal();
 
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + (3600000 * jwtExpirationInHr));
