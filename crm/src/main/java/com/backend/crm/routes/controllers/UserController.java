@@ -20,7 +20,8 @@ public class UserController {
     private final UserService service;
 
     @PostMapping("/signup")
-    public Response signup(@RequestBody SignupUserDto userDto){
+    public Response signup(@RequestBody AuthUserDto userDto){
+        System.out.println(userDto.toString());
         return this.service.signup(userDto);
     }
 
@@ -29,7 +30,7 @@ public class UserController {
         return this.service.getUser(Authorization, id);
     }
 
-    @PostMapping("/auth")
+    @PostMapping("/login")
     public Response authUser(@RequestBody AuthUserDto userDto){
         return this.service.loginUser(userDto);
     }

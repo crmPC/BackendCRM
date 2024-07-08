@@ -23,18 +23,19 @@ public class UserService {
 
     private final TokenService tokenService;
 
-    public Response signup(SignupUserDto userDto) {
+    public Response signup(AuthUserDto userDto) {
         try {
             if (userDto == null) {
                 return new Response(HttpStatus.NO_CONTENT.value(), "Данные о пользователе пусты");
             }
 
             if (this.repositories.findByLogin(userDto.getLogin()) != null) {
-                System.out.println("Пользователь с таким логином уже существует");
                 return new Response(HttpStatus.CONFLICT.value(), "Пользователь с таким Login уже существует");
             }
 
-            UserEntity user = create(userDto);
+            UserEntity user = new UserEntity();
+
+            user.setLogin(userDto.getLogin());
             user.setPassword(PasswordUtils.encodePassword(userDto.getPassword()));
 
             this.repositories.save(user);
@@ -54,11 +55,11 @@ public class UserService {
                 return new Response(HttpStatus.NO_CONTENT.value(), "Пользователя с таким login нет");
             }
 
-            if (PasswordUtils.matches(user.getPassword(), dto.getPassword())){
-                return new ResponseData<>(HttpStatus.OK.value(), "Успешно авторизован", this.tokenService.generateToken(user));
+            if (!PasswordUtils.matches(user.getPassword(), dto.getPassword())){
+                return new Response(HttpStatus.UNAUTHORIZED.value(), "Данные о пользователе пусты");
             }
 
-            return new Response(HttpStatus.UNAUTHORIZED.value(), "Данные о пользователе пусты");
+            return new ResponseData<>(HttpStatus.OK.value(), "Успешно авторизован", this.tokenService.generateToken(user));
         }catch (Exception err){
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
         }
