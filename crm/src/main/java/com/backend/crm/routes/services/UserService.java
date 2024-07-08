@@ -4,15 +4,15 @@ import com.backend.crm.app.config.Mapper;
 import com.backend.crm.app.domain.TokenService;
 import com.backend.crm.app.models.response.types.Response;
 import com.backend.crm.app.models.response.types.ResponseData;
-import com.backend.crm.routes.DTOs.AuthUserDto;
 import com.backend.crm.routes.DTOs.SignupUserDto;
 import com.backend.crm.routes.models.UserEntity;
+import com.backend.crm.routes.models.UserRole;
 import com.backend.crm.routes.repositories.UserRepositories;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.pulsar.PulsarProperties;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +39,35 @@ public class UserService {
 
             return new ResponseData<>(HttpStatus.OK.value(),
                     "Успешно зарегестрирован",
-                    tokenService.generateToken(user));
+                    this.tokenService.generateToken(user));
+        } catch (Exception err) {
+            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+        }
+    }
+
+    public Response getUser(String Authorization, Long id) {
+        try {
+            if (Authorization.isEmpty()) {
+                return new Response(HttpStatus.NO_CONTENT.value(), "Токен отсуствует");
+            }
+
+            if (id == null){
+                return new Response(HttpStatus.NO_CONTENT.value(), "id пользователя пустое");
+            }
+
+            if (!this.tokenService.validateToken(Authorization)){
+                return new Response(HttpStatus.UNAUTHORIZED.value(), "Токен истек");
+            }
+
+            UserEntity admin = this.repositories.findById(this.tokenService.getUserIdFromJWT(Authorization)).get();
+
+            if (admin.getUserRole() != UserRole.ADMIN){
+                return new Response(HttpStatus.FORBIDDEN.value(), "Нет прав на получение пользователя");
+            }
+
+            return new ResponseData<>(HttpStatus.OK.value(),
+                    "Успешно получен",
+                    this.repositories.findById(id));
         } catch (Exception err) {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
         }

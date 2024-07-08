@@ -24,10 +24,10 @@ public class UserController {
         return this.service.signup(userDto);
     }
 
-//    @GetMapping()
-//    public Response getUser(@RequestBody String Authorization){
-//        return this.service.getUser();
-//    }
+    @GetMapping("/{id}")
+    public Response getUser(@RequestHeader String Authorization, @PathVariable Long id){
+        return this.service.getUser(Authorization, id);
+    }
 //
 //    @PostMapping("/auth")
 //    public Response authUser(@RequestBody AuthUserDto userDto){
