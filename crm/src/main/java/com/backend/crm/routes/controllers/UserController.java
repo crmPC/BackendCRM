@@ -28,14 +28,14 @@ public class UserController {
     public Response getUser(@RequestHeader String Authorization, @PathVariable Long id){
         return this.service.getUser(Authorization, id);
     }
-//
-//    @PostMapping("/auth")
-//    public Response authUser(@RequestBody AuthUserDto userDto){
-//        return this.service.authUser();
-//    }
-//
-//    @PostMapping("/ban")
-//    public Response banUser(@RequestBody BanUserDto banUserDto){
-//        return this.service.banUser();
-//    }
+
+    @PostMapping("/auth")
+    public Response authUser(@RequestBody AuthUserDto userDto){
+        return this.service.loginUser(userDto);
+    }
+
+    @PostMapping("/ban/{id}")
+    public Response banUser(@PathVariable Long id, @RequestHeader String Authorization, @RequestBody String BanReason){
+        return this.service.banUser(Authorization, id, BanReason);
+    }
 }
