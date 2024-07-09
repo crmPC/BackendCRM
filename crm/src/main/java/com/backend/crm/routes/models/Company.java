@@ -9,6 +9,7 @@ import java.util.List;
 
 @Data
 @Entity
+@Table(name = "CompanyEntity")
 public class Company {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,11 +21,11 @@ public class Company {
 
     //private DomainAd domainAd;
 
-    private Long fk_contact_wsuser;
+    //private Integer fk_contact_wsuser;
 
     //private WSUSer contactuser;
 
-    private Long fk_id_address;
+    //private Integer fk_id_address;
 
     @OneToOne
     private Address address;
