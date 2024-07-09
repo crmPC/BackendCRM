@@ -16,12 +16,22 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+/**
+ * ## Сервис пользователей
+ *
+ * @author Горелов Дмитрий
+ * */
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepositories repositories;
 
     private final TokenService tokenService;
+
+    /**
+     * Заргестрировать пользователя
+     * */
 
     public Response signup(AuthUserDto userDto) {
         try {
@@ -47,6 +57,10 @@ public class UserService {
         }
     }
 
+    /**
+     * Авторизовать пользователя
+     * */
+
     public Response loginUser(AuthUserDto dto){
         try {
             UserEntity user = this.repositories.findByLogin(dto.getLogin());
@@ -55,7 +69,7 @@ public class UserService {
                 return new Response(HttpStatus.NO_CONTENT.value(), "Пользователя с таким login нет");
             }
 
-            if (!PasswordUtils.matches(user.getPassword(), dto.getPassword())){
+            if (!PasswordUtils.matches(dto.getPassword(), user.getPassword())){
                 return new Response(HttpStatus.UNAUTHORIZED.value(), "Данные о пользователе пусты");
             }
 
@@ -64,6 +78,10 @@ public class UserService {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
         }
     }
+
+    /**
+     * Заблокировать пользователя (может сделать только админ)
+     * */
 
     public Response banUser(String Authorization, Long id, String BanReason){
         try {
@@ -93,6 +111,10 @@ public class UserService {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
         }
     }
+
+    /**
+     * Получить пользователя (Может сделать только админ)
+     * */
 
     public Response getUser(String Authorization, Long id) {
         try {
