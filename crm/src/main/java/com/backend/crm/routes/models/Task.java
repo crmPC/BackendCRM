@@ -5,14 +5,17 @@ import lombok.Data;
 
 @Data
 @Entity
-public class OfficeEquipTypes {
+public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_office_equip_types;
+    private Long id;
 
     @Column
-    private String name;
+    private String strCron;
 
     @Column
-    private String description;
+    private String cronTime;
+
+    @ManyToOne
+    private DomainAd domainAd;
 }

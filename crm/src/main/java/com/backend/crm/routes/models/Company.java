@@ -3,7 +3,6 @@ package com.backend.crm.routes.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.springframework.jdbc.core.SqlReturnType;
 
 import java.util.List;
 
@@ -19,28 +18,33 @@ public class Company {
 
     private String contact;
 
-    //private DomainAd domainAd;
+    @ManyToOne
+    private DomainAd domainAd;
 
-    //private Integer fk_contact_wsuser;
-
-    //private WSUSer contactuser;
-
-    //private Integer fk_id_address;
+    @ManyToOne
+    private WSUSer contactuser;
 
     @OneToOne
     private Address address;
 
-    //private FormatEnum format;
+    @Column
+    private FormatEnum format;
 
+    @Column
     private String INN;
 
+    @Column
     private String prefix;
 
+    @Column
     private String email_domain;
 
+    @Column
     private String description;
 
-    //private List<DomainMail> domainMail;
+    @ManyToMany
+    private List<DomainMail> domainMail;
 
-    //private List<OfficeEquip> officeequip;
+    @ManyToMany
+    private List<OfficeEquip> officeequip;
 }

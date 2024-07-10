@@ -12,31 +12,31 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_user;
 
-    @Column()
+    @Column
     private String name;
 
-    @Column()
+    @Column
     private String surname;
 
-    @Column()
+    @Column
     private String patronymic;
 
-    @Column()
+    @Column
     private Date dob;
 
-    @Column()
+    @Column
     private String login;
 
-    @Column()
+    @Column
     private String password;
 
-    @Column()
+    @Column
     private boolean banned = false;
 
-    @Column()
+    @Column
     private String banReason;
 
-    @Column()
+    @Column
     @Enumerated(EnumType.STRING)
     private UserRole userRole = UserRole.NOT_ACTIVATED;
 }

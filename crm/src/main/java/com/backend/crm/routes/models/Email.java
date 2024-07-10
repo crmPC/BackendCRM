@@ -5,14 +5,20 @@ import lombok.Data;
 
 @Data
 @Entity
-public class OfficeEquipTypes {
+public class Email {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_office_equip_types;
+    private Long id_email;
 
     @Column
     private String name;
 
     @Column
-    private String description;
+    private String name_with_domain;
+
+    @Column
+    private String password;
+
+    @ManyToOne
+    private DomainMail domainMail;
 }

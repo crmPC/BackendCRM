@@ -5,14 +5,14 @@ import lombok.Data;
 
 @Data
 @Entity
-public class OfficeEquipTypes {
+public class AccessUsersCompany{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_office_equip_types;
+    private Long id_access_users_company;
 
-    @Column
-    private String name;
+    @ManyToOne
+    private UserEntity userEntity;
 
-    @Column
-    private String description;
+    @ManyToOne
+    private Company company;
 }

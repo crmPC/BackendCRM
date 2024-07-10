@@ -5,14 +5,14 @@ import lombok.Data;
 
 @Data
 @Entity
-public class OfficeEquipTypes {
+public class AllowedIp {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_office_equip_types;
+    private Long id_allowed_ip;
+
+    @Column(columnDefinition = "INET")
+    private String address;
 
     @Column
-    private String name;
-
-    @Column
-    private String description;
+    private String prim;
 }

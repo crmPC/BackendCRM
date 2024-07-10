@@ -10,7 +10,8 @@ public class Columns {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long id_wsuser;
+    @ManyToOne
+    private WSUSer id_wsuser;
 
     @Column(columnDefinition = "jsonb")
     private String columns;
