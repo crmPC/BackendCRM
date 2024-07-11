@@ -8,7 +8,7 @@ import lombok.Data;
 public class AccessUsersCompany{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_access_users_company;
+    private Long idAccessUsersCompany;
 
     @ManyToOne
     private UserEntity userEntity;

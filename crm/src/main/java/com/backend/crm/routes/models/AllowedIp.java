@@ -8,7 +8,7 @@ import lombok.Data;
 public class AllowedIp {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_allowed_ip;
+    private Long idAllowedIp;
 
     @Column(columnDefinition = "INET")
     private String address;

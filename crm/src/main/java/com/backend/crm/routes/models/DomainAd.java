@@ -10,7 +10,7 @@ import java.sql.Date;
 public class DomainAd {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_domain_ad;
+    private Long idComainAd;
 
     @Column
     private String name;

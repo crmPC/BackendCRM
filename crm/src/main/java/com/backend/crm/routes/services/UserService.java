@@ -48,6 +48,7 @@ public class UserService {
             user.setLogin(userDto.getLogin());
             user.setPassword(PasswordUtils.encodePassword(userDto.getPassword()));
 
+            System.out.println(user.toString());
             this.repositories.save(user);
             return new ResponseData<>(HttpStatus.OK.value(),
                     "Успешно зарегестрирован",
@@ -64,7 +65,7 @@ public class UserService {
     public Response loginUser(AuthUserDto dto){
         try {
             UserEntity user = this.repositories.findByLogin(dto.getLogin());
-
+            System.out.println(dto.toString());
             if (user == null){
                 return new Response(HttpStatus.NO_CONTENT.value(), "Пользователя с таким login нет");
             }

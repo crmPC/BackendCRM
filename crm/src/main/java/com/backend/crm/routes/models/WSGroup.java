@@ -10,7 +10,7 @@ import java.util.List;
 public class WSGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_es_group;
+    private Long idEsGroup;
 
     @ManyToOne
     private DomainAd domainAd;

@@ -8,7 +8,7 @@ import lombok.Data;
 public class Vendor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_vendor;
+    private Long idVendor;
 
     @Column
     private String name;

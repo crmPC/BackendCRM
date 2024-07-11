@@ -11,7 +11,7 @@ import java.util.List;
 public class WSUSer{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_ws_user;
+    private Long idWsUser;
 
     @Column
     private String fullname;

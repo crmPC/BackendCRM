@@ -10,7 +10,7 @@ import java.util.List;
 public class DomainMail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_domain_mail;
+    private Long idDomainMail;
 
     @ManyToOne
     private Company company;

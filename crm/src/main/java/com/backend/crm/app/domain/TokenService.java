@@ -24,7 +24,7 @@ public class TokenService {
         Date expiryDate = new Date(now.getTime() + (3600000 * jwtExpirationInHr));
 
         return Jwts.builder()
-                .setSubject(Long.toString(userPrincipal.getId_user()))
+                .setSubject(Long.toString(userPrincipal.getIdUser()))
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)

@@ -8,7 +8,7 @@ import lombok.Data;
 public class OfficeEquipTypes {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_office_equip_types;
+    private Long idOfficeEquipTypes;
 
     @Column
     private String name;

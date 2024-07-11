@@ -10,7 +10,7 @@ import java.sql.Date;
 public class Log {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_log;
+    private Long idLog;
 
     @ManyToOne
     private UserEntity fk_id_user;

@@ -8,7 +8,7 @@ import lombok.Data;
 public class Communication {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_communication;
+    private Long idCommunication;
 
     @Column
     private CommunicationTypeEnum type;

@@ -8,7 +8,7 @@ import lombok.Data;
 public class WSGroupsUsers {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_wsgroupsusers;
+    private Long idWsgroupsusers;
 
     @ManyToOne
     private WSUSer user;

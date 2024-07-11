@@ -10,10 +10,7 @@ import java.sql.Date;
 public class OfficeEquip {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_office_equip;
-
-    @Column
-    private Long fk_id_company;
+    private Long idOfficeEquip;
 
     @Column
     private Long fk_id_office_equip_types;
@@ -50,7 +47,6 @@ public class OfficeEquip {
     private Company company;
 
     @ManyToOne
-    @JoinColumn(name = "id_office_equip_types")
     private OfficeEquipTypes officeEquipType;
 
 }

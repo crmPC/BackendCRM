@@ -10,7 +10,7 @@ import java.sql.Date;
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_user;
+    private Long idUser;
 
     @Column
     private String name;

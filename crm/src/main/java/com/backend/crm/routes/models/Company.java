@@ -12,10 +12,12 @@ import java.util.List;
 public class Company {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_company;
+    private Long idCompany;
 
+    @Column
     private String name;
 
+    @Column
     private String contact;
 
     @ManyToOne

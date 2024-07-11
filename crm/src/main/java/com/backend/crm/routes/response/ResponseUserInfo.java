@@ -26,7 +26,7 @@ public class ResponseUserInfo {
     private UserRole userRole;
 
     public ResponseUserInfo(UserEntity user){
-        this.id_user = user.getId_user();
+        this.id_user = user.getIdUser();
         this.name = user.getName();
         this.surname = user.getSurname();
         this.patronymic = user.getPatronymic();

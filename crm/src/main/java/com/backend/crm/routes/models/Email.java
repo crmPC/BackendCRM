@@ -8,7 +8,7 @@ import lombok.Data;
 public class Email {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_email;
+    private Long idEmail;
 
     @Column
     private String name;
