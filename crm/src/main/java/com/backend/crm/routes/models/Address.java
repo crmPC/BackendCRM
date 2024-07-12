@@ -3,6 +3,8 @@ package com.backend.crm.routes.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.sql.Date;
+
 @Data
 @Entity
 public class Address {
@@ -31,6 +33,12 @@ public class Address {
     @Column
     private String apartment;
 
-    @OneToOne
-    private Company company;
+    @Column
+    private Date createdAt;
+
+    @Column
+    private Date updatedAt;
+
+    @Column
+    private Date deletedAt;
 }

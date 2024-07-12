@@ -13,8 +13,3 @@ public class SortDto {
     private List<SortField> sort;
 }
 
-@Data
-class SortField {
-    private String field;
-    private String sortDir;
-}

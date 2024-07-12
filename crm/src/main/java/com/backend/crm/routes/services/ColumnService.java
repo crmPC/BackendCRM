@@ -19,4 +19,12 @@ public class ColumnService {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
         }
     }
+
+    public Response saveColumn(){
+        try {
+            return null;
+        }catch (Exception err){
+            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+        }
+    }
 }
