@@ -72,7 +72,4 @@ public class WSUSer{
 
     @ManyToOne
     private DomainAd domainAd;
-
-    @OneToMany
-    private List<WSGroup> wsgroup;
 }
