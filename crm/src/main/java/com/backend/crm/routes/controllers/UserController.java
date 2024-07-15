@@ -32,6 +32,7 @@ public class UserController {
 
     @PostMapping("/login")
     public Response authUser(@RequestBody AuthUserDto userDto){
+        System.out.println(userDto.toString());
         return this.service.loginUser(userDto);
     }
 
