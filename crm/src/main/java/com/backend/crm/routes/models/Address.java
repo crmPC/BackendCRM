@@ -3,7 +3,7 @@ package com.backend.crm.routes.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -34,11 +34,11 @@ public class Address {
     private String apartment;
 
     @Column
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @Column
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     @Column
-    private Date deletedAt;
+    private LocalDateTime deletedAt;
 }

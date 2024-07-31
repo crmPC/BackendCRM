@@ -15,6 +15,13 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+/**
+ * ## Сервис адресов
+ *
+ * @author Горелов Дмитрий
+ * */
 
 @Service
 @AllArgsConstructor
@@ -24,7 +31,7 @@ public class AddressService {
     private final Mapper mapper;
 
     /**
-     * Создать новый адрсе
+     * Создать новый адрес
      * */
 
     public Response saveAddress(AddressDto dto){
@@ -34,7 +41,7 @@ public class AddressService {
             }
 
             Address address = mapper.getMapper().map(dto, Address.class);
-            address.setCreatedAt(Date.valueOf(LocalDate.now()));
+            address.setCreatedAt(LocalDateTime.now());
 
             this.repository.save(address);
             return new Response(HttpStatus.OK.value(), "Адрес успешно сохранен");
@@ -101,7 +108,7 @@ public class AddressService {
     public Response deleteAddressById(Long id){
         try {
             Address address = this.repository.findById(id).get();
-            address.setDeletedAt(Date.valueOf(LocalDate.now()));
+            address.setDeletedAt(LocalDateTime.now());
 
             this.repository.save(address);
             return new Response(HttpStatus.OK.value(), "Успешно удалено");
@@ -125,7 +132,7 @@ public class AddressService {
             address.setStreet(dto.getApartment());
             address.setRegion(dto.getRegion());
             address.setZipCode(dto.getZipCode());
-            address.setUpdatedAt(Date.valueOf(LocalDate.now()));
+            address.setUpdatedAt(LocalDateTime.now());
 
             return address;
         }catch (Exception err){
