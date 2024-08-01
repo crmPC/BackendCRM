@@ -33,4 +33,16 @@ public class CommunicationController {
     public Response editCommunication(@RequestParam("id") Long id, @RequestBody CommunicationDto communicationDto){
         return this.service.editCommunication(id, communicationDto);
     }
+
+    @DeleteMapping
+    @Operation(summary = "Удалить средство связи")
+    public Response deleteCommunicationById(@RequestParam Long id){
+        return this.service.deleteCommunicationById(id);
+    }
+
+    @GetMapping
+    @Operation(summary = "Получить средство связи")
+    public Response findCommunicationById(@RequestParam Long id){
+        return this.service.findCommunicationById(id);
+    }
 }

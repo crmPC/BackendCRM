@@ -13,9 +13,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 /**
  * ## Сервис адресов
@@ -44,7 +43,7 @@ public class AddressService {
             address.setCreatedAt(LocalDateTime.now());
 
             this.repository.save(address);
-            return new Response(HttpStatus.OK.value(), "Адрес успешно сохранен");
+            return new Response(HttpStatus.CREATED.value(), "Адрес успешно сохранен");
         }catch (Exception err){
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
         }
@@ -56,7 +55,10 @@ public class AddressService {
 
     public Response findAllWithSort(SortDto dto){
         try {
-            System.out.println(dto.getSort().getFirst().getField());
+            if (dto.getSort().isEmpty()){
+                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll());
+            }
+
             PageRequest pageRequest;
             if (dto.getSort().getFirst().getSortDir().equals("asc")){
                 pageRequest = PageRequest.of(dto.getPage()-1,
@@ -95,7 +97,9 @@ public class AddressService {
 
     public Response findAddressById(Long id){
         try {
-            return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findById(id).get());
+            return new ResponseData<>(HttpStatus.OK.value(),
+                    "Успешно получено",
+                    this.repository.findById(id).get());
         }catch (Exception err){
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
         }
@@ -107,11 +111,23 @@ public class AddressService {
 
     public Response deleteAddressById(Long id){
         try {
-            Address address = this.repository.findById(id).get();
-            address.setDeletedAt(LocalDateTime.now());
+            Optional<Address> current = this.repository.findById(id);
+
+            if (current.isEmpty()){
+                return new Response(HttpStatus.NOT_FOUND.value(), "Такого средства связи нет");
+            }
+
+            Address address = current.get();
+
+            if (address.getDeletedAt() != null){
+                address.setDeletedAt(null);
+                address.setUpdatedAt(LocalDateTime.now());
+            }else {
+                address.setDeletedAt(LocalDateTime.now());
+            }
 
             this.repository.save(address);
-            return new Response(HttpStatus.OK.value(), "Успешно удалено");
+            return new Response(HttpStatus.OK.value(), "Успешно удалено/востановлено");
         }catch (Exception err){
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
         }

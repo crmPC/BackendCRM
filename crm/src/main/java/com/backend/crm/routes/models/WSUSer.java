@@ -30,9 +30,6 @@ public class WSUSer{
     @ManyToOne
     private JobTittle jobTittle;
 
-    @ManyToOne
-    private Communication communication;
-
     @OneToOne
     private Pass pass;
 

@@ -41,4 +41,7 @@ public class Address {
 
     @Column
     private LocalDateTime deletedAt;
+
+//    @ManyToOne
+//    private WSUSer wsuser;
 }

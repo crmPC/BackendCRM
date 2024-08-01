@@ -16,7 +16,7 @@ public class OfficeEquip {
     private Long fk_id_office_equip_types;
 
     @ManyToOne
-    @JoinColumn(name = "id_vendor")
+    @JoinColumn(name = "idVendor")
     private Vendor vendor;
 
     @Column

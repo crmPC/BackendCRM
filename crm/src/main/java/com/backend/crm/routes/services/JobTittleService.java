@@ -1,11 +1,12 @@
 package com.backend.crm.routes.services;
 
+import com.backend.crm.app.config.Mapper;
 import com.backend.crm.app.models.response.types.Response;
 import com.backend.crm.app.models.response.types.ResponseData;
-import com.backend.crm.routes.DTOs.CommunicationDto;
+import com.backend.crm.routes.DTOs.JobTittleDto;
 import com.backend.crm.routes.DTOs.SortDto;
-import com.backend.crm.routes.models.Communication;
-import com.backend.crm.routes.repositories.CommunicationRepository;
+import com.backend.crm.routes.models.JobTittle;
+import com.backend.crm.routes.repositories.JobTittleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -16,22 +17,28 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
- * ## Сервис комуникации
+ * ## Сервис должностей
  *
  * @author Горелов Дмитрий
  */
 
 @Service
 @RequiredArgsConstructor
-public class CommunicationService {
-    private final CommunicationRepository repository;
+public class JobTittleService {
+    private final JobTittleRepository repository;
+
+    private final Mapper mapper;
 
     /**
-     * Получить все средства связи
+     * Получить все должности
      */
 
-    public Response findAllCommunicationBySort(SortDto dto) {
+    public Response findAllJobTittleBySort(SortDto dto) {
         try {
+            if (dto.getSort().isEmpty()){
+                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll());
+            }
+
             PageRequest pageRequest;
 
             if (dto.getSort().getFirst().getSortDir().equals("asc")) {
@@ -51,91 +58,84 @@ public class CommunicationService {
     }
 
     /**
-     * Добавить новое средство связи
+     * Добавить новую должность
      */
 
-    public Response saveCommunication(CommunicationDto communicationDto) {
+    public Response saveJobTittle(JobTittleDto dto){
         try {
-            Communication communication = new Communication(communicationDto.getType(),
-                    communicationDto.getValue());
-            communication.setCreatedAt(LocalDateTime.now());
+            JobTittle jobTittle = mapper.getMapper().map(dto, JobTittle.class);
+            jobTittle.setCreatedAt(LocalDateTime.now());
 
-            this.repository.save(communication);
+            this.repository.save(jobTittle);
             return new Response(HttpStatus.CREATED.value(), "Успешно сохранено");
-        } catch (Exception err) {
+        }catch (Exception err){
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
         }
     }
 
     /**
-     * Изменить средство связи
+     * Изменить существующую должность
      */
 
-    public Response editCommunication(Long id, CommunicationDto communicationDto) {
+    public Response saveEditJobTittle(Long id, JobTittleDto dto){
         try {
-            Optional<Communication> current = this.repository.findById(id);
+            Optional<JobTittle> current = this.repository.findById(id);
 
-            if (current.isEmpty()) {
-                return new Response(HttpStatus.NOT_FOUND.value(), "Такого средства связи не существует");
+            if (current.isEmpty()){
+                return new Response(HttpStatus.NOT_FOUND.value(), "Такой должности нет");
             }
 
-            Communication communication = current.get();
-            communication = updateCommunication(communicationDto, communication);
+            JobTittle jobTittle = current.get();
+            jobTittle.setName(dto.getName());
+            jobTittle.setDescription(dto.getDescription());
+            jobTittle.setUpdatedAt(LocalDateTime.now());
 
-            this.repository.save(communication);
+            this.repository.save(jobTittle);
             return new Response(HttpStatus.OK.value(), "Успешно сохранено");
-        } catch (Exception err) {
+        }catch (Exception err){
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
         }
     }
 
     /**
-     * Удалить средство связи
+     * Удалить должность
      */
 
-    public Response deleteCommunicationById(Long id){
+    public Response deleteById(Long id){
         try {
-            Optional<Communication> current = this.repository.findById(id);
+            Optional<JobTittle> current = this.repository.findById(id);
 
             if (current.isEmpty()){
                 return new Response(HttpStatus.NOT_FOUND.value(), "Такого средства связи нет");
             }
 
-            Communication communication = current.get();
+            JobTittle jobTittle = current.get();
 
-            if (communication.getDeletedAt() != null){
-                communication.setDeletedAt(null);
-                communication.setUpdatedAt(LocalDateTime.now());
+            if (jobTittle.getDeletedAt() != null){
+                jobTittle.setDeletedAt(null);
+                jobTittle.setUpdatedAt(LocalDateTime.now());
             }else {
-                communication.setDeletedAt(LocalDateTime.now());
+                jobTittle.setDeletedAt(LocalDateTime.now());
             }
 
-            this.repository.save(communication);
+            this.repository.save(jobTittle);
             return new Response(HttpStatus.OK.value(), "Успешно удалено/востановлено");
         }catch (Exception err){
-            System.out.println(err.getMessage());
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
         }
     }
 
     /**
-     * Получить средство связи
+     * Получить должность
      */
 
-    public Response findCommunicationById(Long id){
+    public Response findById(Long id){
         try {
-            return new ResponseData(HttpStatus.OK.value(),
+            return new ResponseData<>(HttpStatus.OK.value(),
                     "Успешно получено",
                     this.repository.findById(id).get());
         }catch (Exception err){
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
         }
-    }
-
-    private Communication updateCommunication(CommunicationDto dto, Communication communication){
-        communication.setUpdatedAt(LocalDateTime.now());
-        communication.setValue(dto.getValue());
-        communication.setType(dto.getType());
-        return communication;
     }
 }

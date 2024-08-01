@@ -3,7 +3,7 @@ package com.backend.crm.routes.services;
 import com.backend.crm.app.models.response.types.Response;
 import com.backend.crm.app.models.response.types.ResponseData;
 import com.backend.crm.routes.DTOs.SortDto;
-import com.backend.crm.routes.repositories.WSUSerRepository;
+import com.backend.crm.routes.repositories.CompanyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -11,21 +11,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 /**
- * ## Сервис пользователей
+ * ## Сервис компании
  *
  * @author Горелов Дмитрий
  */
 
 @Service
 @RequiredArgsConstructor
-public class WSUSerService {
-    private final WSUSerRepository repository;
+public class CompanyService {
+    private final CompanyRepository repository;
 
     /**
-     * Получить всех пользователей
+     * Получить все компании
      */
 
-    public Response findAllWSUSerBySort(SortDto dto) {
+    public Response findAllCompanyBySort(SortDto dto) {
         try {
             if (dto.getSort().isEmpty()){
                 return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll());
