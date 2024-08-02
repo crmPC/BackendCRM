@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.*;
 public class ColumnController {
     private final ColumnService service;
 
-    @GetMapping("")
+    @GetMapping
     public Response findAllColumn(){
         return this.service.findAll();
     }
 
-    @PostMapping("")
+    @PostMapping
     public Response saveColumn(@RequestBody Object object, @RequestHeader String Authorization){
         System.out.println(object.toString());
         System.out.println(Authorization);

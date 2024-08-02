@@ -7,11 +7,11 @@ import org.springframework.http.HttpStatus;
 @Data
 @JsonPropertyOrder({"status", "message"})
 public class Response {
-    private final int status;
+    private final HttpStatus status;
     private final String message;
 
     public Response(int status, String message) {
-        this.status = status;
+        this.status = HttpStatus.valueOf(status);
         this.message = message;
     }
 }

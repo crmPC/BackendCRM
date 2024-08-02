@@ -60,7 +60,8 @@ public class CommunicationService {
 
     public Response save(CommunicationDto communicationDto) {
         try {
-            Communication communication = new Communication(communicationDto.getType(),
+            Communication communication = new Communication(
+                    communicationDto.getType(),
                     communicationDto.getValue());
             communication.setCreatedAt(LocalDateTime.now());
 

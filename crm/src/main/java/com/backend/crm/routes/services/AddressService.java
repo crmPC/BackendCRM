@@ -125,7 +125,6 @@ public class AddressService {
             }else {
                 address.setDeletedAt(LocalDateTime.now());
             }
-
             this.repository.save(address);
             return new Response(HttpStatus.OK.value(), "Успешно удалено/востановлено");
         }catch (Exception err){

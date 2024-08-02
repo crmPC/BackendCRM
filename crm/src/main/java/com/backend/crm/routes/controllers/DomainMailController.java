@@ -2,7 +2,6 @@ package com.backend.crm.routes.controllers;
 
 import com.backend.crm.app.models.response.types.Response;
 import com.backend.crm.routes.DTOs.DomainMailDto;
-import com.backend.crm.routes.DTOs.JobTittleDto;
 import com.backend.crm.routes.DTOs.SortDto;
 import com.backend.crm.routes.services.DomainMailService;
 import io.swagger.v3.oas.annotations.Operation;
