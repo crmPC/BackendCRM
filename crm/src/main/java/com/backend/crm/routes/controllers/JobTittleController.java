@@ -11,27 +11,27 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Сервис должностей")
 @RestController
-@RequestMapping("/jobtittle")
+@RequestMapping("/jobtitle")
 @RequiredArgsConstructor
 public class JobTittleController {
     private final JobTittleService service;
 
     @PostMapping("/all")
     @Operation(summary = "Получить все должности")
-    public Response findAllCommunicationBySort(@RequestBody SortDto sortDto){
-        return this.service.findAllJobTittleBySort(sortDto);
+    public Response findAllJobTittleBySort(@RequestBody SortDto sortDto){
+        return this.service.findAllBySort(sortDto);
     }
 
     @PostMapping
     @Operation(summary = "Добавить новую должность")
     public Response saveJobTittle(@RequestBody JobTittleDto jobTittleDto){
-        return this.service.saveJobTittle(jobTittleDto);
+        return this.service.save(jobTittleDto);
     }
 
     @PutMapping
     @Operation(summary = "Изменить должность")
     public Response editJobTittle(@RequestParam("id") Long id, @RequestBody JobTittleDto jobTittleDto){
-        return this.service.saveEditJobTittle(id, jobTittleDto);
+        return this.service.saveEdit(id, jobTittleDto);
     }
 
     @DeleteMapping

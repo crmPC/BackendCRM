@@ -19,30 +19,30 @@ public class CommunicationController {
     @PostMapping("/all")
     @Operation(summary = "Получить все средства связи (передается параметром)")
     public Response findAllCommunicationBySort(@RequestBody SortDto sortDto){
-        return this.service.findAllCommunicationBySort(sortDto);
+        return this.service.findAllBySort(sortDto);
     }
 
     @PostMapping
     @Operation(summary = "Добавить новую средсвто связи")
     public Response saveCommunication(@RequestBody CommunicationDto communicationDto){
-        return this.service.saveCommunication(communicationDto);
+        return this.service.save(communicationDto);
     }
 
     @PutMapping
     @Operation(summary = "Изменить средсвто связи")
     public Response editCommunication(@RequestParam("id") Long id, @RequestBody CommunicationDto communicationDto){
-        return this.service.editCommunication(id, communicationDto);
+        return this.service.saveEdit(id, communicationDto);
     }
 
     @DeleteMapping
     @Operation(summary = "Удалить средство связи")
     public Response deleteCommunicationById(@RequestParam Long id){
-        return this.service.deleteCommunicationById(id);
+        return this.service.deleteById(id);
     }
 
     @GetMapping
     @Operation(summary = "Получить средство связи")
     public Response findCommunicationById(@RequestParam Long id){
-        return this.service.findCommunicationById(id);
+        return this.service.findById(id);
     }
 }

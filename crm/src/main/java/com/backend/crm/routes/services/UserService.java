@@ -70,7 +70,7 @@ public class UserService {
                 return new Response(HttpStatus.NO_CONTENT.value(), "Пользователя с таким login нет");
             }
 
-            if (!PasswordUtils.matches(dto.getPassword(), user.getPassword())){
+            if (PasswordUtils.matches(dto.getPassword(), user.getPassword())){
                 return new Response(HttpStatus.UNAUTHORIZED.value(), "Данные о пользователе пусты");
             }
 

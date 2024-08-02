@@ -3,7 +3,8 @@ package com.backend.crm.routes.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -16,7 +17,7 @@ public class WSUSer{
     private String fullname;
 
     @Column
-    private Date dob;
+    private LocalDate dob;
 
     @OneToOne
     private Company company;
@@ -68,4 +69,13 @@ public class WSUSer{
 
     @ManyToOne
     private DomainAd domainAd;
+
+    @Column
+    private LocalDateTime createdAt;
+
+    @Column
+    private LocalDateTime updatedAt;
+
+    @Column
+    private LocalDateTime deletedAt;
 }

@@ -3,7 +3,7 @@ package com.backend.crm.routes.services;
 import com.backend.crm.app.models.response.types.Response;
 import com.backend.crm.app.models.response.types.ResponseData;
 import com.backend.crm.routes.DTOs.SortDto;
-import com.backend.crm.routes.repositories.CompanyRepository;
+import com.backend.crm.routes.repositories.EmailRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -11,18 +11,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 /**
- * ## Сервис компании
+ * ## Сервис почты
  *
  * @author Горелов Дмитрий
  */
 
+
 @Service
 @RequiredArgsConstructor
-public class CompanyService {
-    private final CompanyRepository repository;
+public class EmailService {
+    private final EmailRepository repository;
 
     /**
-     * Получить все компании
+     * Получить все почты
      */
 
     public Response findAllBySort(SortDto dto) {

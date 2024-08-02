@@ -33,7 +33,7 @@ public class AddressService {
      * Создать новый адрес
      * */
 
-    public Response saveAddress(AddressDto dto){
+    public Response save(AddressDto dto){
         try {
             if (dto == null){
                 return new Response(HttpStatus.NO_CONTENT.value(), "dto - пусто");
@@ -53,7 +53,7 @@ public class AddressService {
      * Получить все адреса с сортировкой постранично
      * */
 
-    public Response findAllWithSort(SortDto dto){
+    public Response findAllBySort(SortDto dto){
         try {
             if (dto.getSort().isEmpty()){
                 return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll());
@@ -82,7 +82,7 @@ public class AddressService {
      * Изменить существующий адрес
      * */
 
-    public Response saveEditAddress(AddressDto dto, Long id){
+    public Response saveEdit(AddressDto dto, Long id){
         try {
             this.repository.save(updateAddress(dto, id));
             return new Response(HttpStatus.OK.value(), "Успешно сохранено");
@@ -95,7 +95,7 @@ public class AddressService {
      * Получить адрес по id
      * */
 
-    public Response findAddressById(Long id){
+    public Response findById(Long id){
         try {
             return new ResponseData<>(HttpStatus.OK.value(),
                     "Успешно получено",
@@ -109,7 +109,7 @@ public class AddressService {
      * Удалить адрес по id
      * */
 
-    public Response deleteAddressById(Long id){
+    public Response deleteById(Long id){
         try {
             Optional<Address> current = this.repository.findById(id);
 

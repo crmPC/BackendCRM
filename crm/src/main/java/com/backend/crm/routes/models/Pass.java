@@ -3,6 +3,8 @@ package com.backend.crm.routes.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @Entity
 public class Pass {
@@ -11,9 +13,14 @@ public class Pass {
     private Long idPass;
 
     @Column
-    private String name;
+    private String number;
 
-    @OneToOne
-    @JoinColumn(name = "fk_pass")
-    private WSUSer wsuser;
+    @Column
+    private LocalDateTime createdAt;
+
+    @Column
+    private LocalDateTime updatedAt;
+
+    @Column
+    private LocalDateTime deletedAt;
 }

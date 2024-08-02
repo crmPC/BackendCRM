@@ -19,30 +19,30 @@ public class AddressController {
     @Operation(summary = "Создать новый адресс")
     @PostMapping
     public Response saveAddress(@RequestBody AddressDto addressDto){
-        return this.service.saveAddress(addressDto);
+        return this.service.save(addressDto);
     }
 
     @Operation(summary = "Получить все адреса с сортровкой (передается параметром)")
     @PostMapping("/all")
-    public Response findAllWithSort(@RequestBody SortDto sortDto){
-        return this.service.findAllWithSort(sortDto);
+    public Response findAllAddressBySort(@RequestBody SortDto sortDto){
+        return this.service.findAllBySort(sortDto);
     }
 
     @Operation(summary = "Изменить существующий адрес")
     @PutMapping
     public Response saveEditAddress(@RequestBody AddressDto addressDto, @RequestParam("id") Long id){
-        return this.service.saveEditAddress(addressDto, id);
+        return this.service.saveEdit(addressDto, id);
     }
 
     @Operation(summary = "Найти адрес")
     @GetMapping
     public Response findAddressById(@RequestParam("id") Long id){
-        return this.service.findAddressById(id);
+        return this.service.findById(id);
     }
 
     @Operation(summary = "Удалить адрес")
     @DeleteMapping
     public Response deleteAddressById(@RequestParam("id") Long id){
-        return this.service.deleteAddressById(id);
+        return this.service.deleteById(id);
     }
 }

@@ -2,6 +2,7 @@ package com.backend.crm.app.models.response.types;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Data;
+import org.springframework.http.HttpStatus;
 
 @Data
 @JsonPropertyOrder({"status", "message"})

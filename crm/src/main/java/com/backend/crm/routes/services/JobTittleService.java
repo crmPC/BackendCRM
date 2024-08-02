@@ -33,7 +33,7 @@ public class JobTittleService {
      * Получить все должности
      */
 
-    public Response findAllJobTittleBySort(SortDto dto) {
+    public Response findAllBySort(SortDto dto) {
         try {
             if (dto.getSort().isEmpty()){
                 return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll());
@@ -61,7 +61,7 @@ public class JobTittleService {
      * Добавить новую должность
      */
 
-    public Response saveJobTittle(JobTittleDto dto){
+    public Response save(JobTittleDto dto){
         try {
             JobTittle jobTittle = mapper.getMapper().map(dto, JobTittle.class);
             jobTittle.setCreatedAt(LocalDateTime.now());
@@ -77,7 +77,7 @@ public class JobTittleService {
      * Изменить существующую должность
      */
 
-    public Response saveEditJobTittle(Long id, JobTittleDto dto){
+    public Response saveEdit(Long id, JobTittleDto dto){
         try {
             Optional<JobTittle> current = this.repository.findById(id);
 

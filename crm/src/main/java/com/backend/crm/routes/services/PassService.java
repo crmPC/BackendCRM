@@ -5,8 +5,10 @@ import com.backend.crm.app.models.response.types.ResponseData;
 import com.backend.crm.routes.DTOs.CommunicationDto;
 import com.backend.crm.routes.DTOs.SortDto;
 import com.backend.crm.routes.models.Communication;
-import com.backend.crm.routes.repositories.CommunicationRepository;
+import com.backend.crm.routes.models.Pass;
+import com.backend.crm.routes.repositories.PassRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -16,18 +18,18 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
- * ## Сервис комуникации
+ * ## Сервис пропусков
  *
  * @author Горелов Дмитрий
  */
 
 @Service
 @RequiredArgsConstructor
-public class CommunicationService {
-    private final CommunicationRepository repository;
+public class PassService {
+    private final PassRepository repository;
 
     /**
-     * Получить все средства связи
+     * Получить все пропуска
      */
 
     public Response findAllBySort(SortDto dto) {
@@ -55,16 +57,16 @@ public class CommunicationService {
     }
 
     /**
-     * Добавить новое средство связи
+     * Добавить новый пропуск
      */
 
-    public Response save(CommunicationDto communicationDto) {
+    public Response save(String name) {
         try {
-            Communication communication = new Communication(communicationDto.getType(),
-                    communicationDto.getValue());
-            communication.setCreatedAt(LocalDateTime.now());
+            Pass pass = new Pass();
+            pass.setNumber(name);
+            pass.setCreatedAt(LocalDateTime.now());
 
-            this.repository.save(communication);
+            this.repository.save(pass);
             return new Response(HttpStatus.CREATED.value(), "Успешно сохранено");
         } catch (Exception err) {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
@@ -72,21 +74,22 @@ public class CommunicationService {
     }
 
     /**
-     * Изменить средство связи
+     * Изменить пропуск
      */
 
-    public Response saveEdit(Long id, CommunicationDto communicationDto) {
+    public Response saveEdit(Long id, String name) {
         try {
-            Optional<Communication> current = this.repository.findById(id);
+            Optional<Pass> current = this.repository.findById(id);
 
             if (current.isEmpty()) {
                 return new Response(HttpStatus.NOT_FOUND.value(), "Такого средства связи не существует");
             }
 
-            Communication communication = current.get();
-            communication = updateCommunication(communicationDto, communication);
+            Pass pass = current.get();
+            pass.setNumber(name);
+            pass.setUpdatedAt(LocalDateTime.now());
 
-            this.repository.save(communication);
+            this.repository.save(pass);
             return new Response(HttpStatus.OK.value(), "Успешно сохранено");
         } catch (Exception err) {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
@@ -94,27 +97,27 @@ public class CommunicationService {
     }
 
     /**
-     * Удалить средство связи
+     * Удалить пропуск
      */
 
     public Response deleteById(Long id){
         try {
-            Optional<Communication> current = this.repository.findById(id);
+            Optional<Pass> current = this.repository.findById(id);
 
             if (current.isEmpty()){
                 return new Response(HttpStatus.NOT_FOUND.value(), "Такого средства связи нет");
             }
 
-            Communication communication = current.get();
+            Pass pass = current.get();
 
-            if (communication.getDeletedAt() != null){
-                communication.setDeletedAt(null);
-                communication.setUpdatedAt(LocalDateTime.now());
+            if (pass.getDeletedAt() != null){
+                pass.setDeletedAt(null);
+                pass.setUpdatedAt(LocalDateTime.now());
             }else {
-                communication.setDeletedAt(LocalDateTime.now());
+                pass.setDeletedAt(LocalDateTime.now());
             }
 
-            this.repository.save(communication);
+            this.repository.save(pass);
             return new Response(HttpStatus.OK.value(), "Успешно удалено/востановлено");
         }catch (Exception err){
             System.out.println(err.getMessage());
@@ -123,7 +126,7 @@ public class CommunicationService {
     }
 
     /**
-     * Получить средство связи
+     * Получить пропуск
      */
 
     public Response findById(Long id){
@@ -134,12 +137,5 @@ public class CommunicationService {
         }catch (Exception err){
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
         }
-    }
-
-    private Communication updateCommunication(CommunicationDto dto, Communication communication){
-        communication.setUpdatedAt(LocalDateTime.now());
-        communication.setValue(dto.getValue());
-        communication.setType(dto.getType());
-        return communication;
     }
 }
