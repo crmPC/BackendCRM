@@ -63,12 +63,9 @@ public class WSUSerService {
 
     public Response save(WSUSerDto dto) {
         try {
-            //приходит объект респонса
-
             WSUSer wsuSer = mapper.getMapper().map(dto, WSUSer.class);
-            wsuSer.setCreatedAt(LocalDateTime.now());
-
             this.repository.save(wsuSer);
+
             return new Response(HttpStatus.CREATED.value(), "Успешно сохранено");
         } catch (Exception err) {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());

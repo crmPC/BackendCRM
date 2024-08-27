@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 /**
  * ## Сервис почты домена
@@ -66,6 +67,73 @@ public class DomainMailService {
 
             this.repository.save(domainMail);
             return new Response(HttpStatus.CREATED.value(), "Успешно сохранено");
+        }catch (Exception err){
+            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+        }
+    }
+
+    /**
+     * Изменить почту
+     */
+
+    public Response saveEdit(Long id, DomainMailDto dto) {
+        try {
+            Optional<DomainMail> current = this.repository.findById(id);
+
+            if (current.isEmpty()) {
+                return new Response(HttpStatus.NOT_FOUND.value(), "Такого средства связи не существует");
+            }
+
+            DomainMail domainMail = current.get();
+            domainMail.setCompany(dto.getCompany());
+            domainMail.setName(dto.getName());
+            domainMail.setUpdatedAt(LocalDateTime.now());
+
+            this.repository.save(domainMail);
+            return new Response(HttpStatus.OK.value(), "Успешно сохранено");
+        } catch (Exception err) {
+            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+        }
+    }
+
+    /**
+     * Удалить почту
+     */
+
+    public Response deleteById(Long id){
+        try {
+            Optional<DomainMail> current = this.repository.findById(id);
+
+            if (current.isEmpty()){
+                return new Response(HttpStatus.NOT_FOUND.value(), "Такого средства связи нет");
+            }
+
+            DomainMail domainMail = current.get();
+
+            if (domainMail.getDeletedAt() != null){
+                domainMail.setDeletedAt(null);
+                domainMail.setUpdatedAt(LocalDateTime.now());
+            }else {
+                domainMail.setDeletedAt(LocalDateTime.now());
+            }
+
+            this.repository.save(domainMail);
+            return new Response(HttpStatus.OK.value(), "Успешно удалено/востановлено");
+        }catch (Exception err){
+            System.out.println(err.getMessage());
+            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+        }
+    }
+
+    /**
+     * Получить почту
+     */
+
+    public Response findById(Long id){
+        try {
+            return new ResponseData(HttpStatus.OK.value(),
+                    "Успешно получено",
+                    this.repository.findById(id).get());
         }catch (Exception err){
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
         }
