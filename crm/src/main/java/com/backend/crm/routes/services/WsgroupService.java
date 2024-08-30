@@ -4,34 +4,36 @@ import com.backend.crm.app.config.Mapper;
 import com.backend.crm.app.models.response.types.Response;
 import com.backend.crm.app.models.response.types.ResponseData;
 import com.backend.crm.routes.DTOs.SortDto;
+import com.backend.crm.routes.DTOs.WSGroupDto;
 import com.backend.crm.routes.DTOs.WSUSerDto;
-import com.backend.crm.routes.models.WSUSer;
-import com.backend.crm.routes.repositories.WSUSerRepository;
+import com.backend.crm.routes.models.WSGroup;
+import com.backend.crm.routes.repositories.WsgroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
- * ## Сервис пользователей
+ * ## Сервис групп пользователей
  *
  * @author Горелов Дмитрий
  */
 
 @Service
 @RequiredArgsConstructor
-public class WSUSerService {
-    private final WSUSerRepository repository;
+public class WsgroupService {
+
+    private final WsgroupRepository repository;
 
     private final Mapper mapper;
 
+
     /**
-     * Получить всех пользователей
+     * Получить все группы пользователей
      */
 
     public Response findAllBySort(SortDto dto) {
@@ -59,15 +61,15 @@ public class WSUSerService {
     }
 
     /**
-     * Добавить нового пользователя
+     * Добавить новую группу пользователей
      */
 
     public Response save(WSUSerDto dto) {
         try {
-            WSUSer wsuSer = mapper.getMapper().map(dto, WSUSer.class);
-            wsuSer.setCreatedAt(LocalDateTime.now());
+            WSGroup wsGroup = mapper.getMapper().map(dto, WSGroup.class);
+            wsGroup.setCreatedAt(LocalDateTime.now());
 
-            this.repository.save(wsuSer);
+            this.repository.save(wsGroup);
             return new Response(HttpStatus.CREATED.value(), "Успешно сохранено");
         } catch (Exception err) {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
@@ -75,22 +77,22 @@ public class WSUSerService {
     }
 
     /**
-     * Изменить пользователя
+     * Изменить группу пользователей
      */
 
-    public Response saveEdit(Long id, WSUSerDto dto) {
+    public Response saveEdit(Long id, WSGroupDto dto) {
         try {
-            Optional<WSUSer> current = this.repository.findById(id);
+            Optional<WSGroup> current = this.repository.findById(id);
 
             if (current.isEmpty()) {
-                return new Response(HttpStatus.NOT_FOUND.value(), "Такого пользователя нет");
+                return new Response(HttpStatus.NOT_FOUND.value(), "Такой группы пользователей нет");
             }
 
-            WSUSer wsuSer = current.get();
-            wsuSer = mapper.getMapper().map(dto, WSUSer.class);
-            wsuSer.setUpdatedAt(LocalDateTime.now());
+            WSGroup wsGroup = current.get();
+            wsGroup = mapper.getMapper().map(dto, WSGroup.class);
+            wsGroup.setUpdatedAt(LocalDateTime.now());
 
-            this.repository.save(wsuSer);
+            this.repository.save(wsGroup);
             return new Response(HttpStatus.OK.value(), "Успешно сохранено");
         } catch (Exception err) {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
@@ -98,27 +100,27 @@ public class WSUSerService {
     }
 
     /**
-     * Удалить пользователя
+     * Удалить группу пользователей
      */
 
     public Response deleteById(Long id){
         try {
-            Optional<WSUSer> current = this.repository.findById(id);
+            Optional<WSGroup> current = this.repository.findById(id);
 
             if (current.isEmpty()){
-                return new Response(HttpStatus.NOT_FOUND.value(), "Такого пользователя нет");
+                return new Response(HttpStatus.NOT_FOUND.value(), "Такой группы пользователей нет");
             }
 
-            WSUSer wsuSer = current.get();
+            WSGroup wsGroup = current.get();
 
-            if (wsuSer.getDeletedAt() != null){
-                wsuSer.setDeletedAt(null);
-                wsuSer.setUpdatedAt(LocalDateTime.now());
+            if (wsGroup.getDeletedAt() != null){
+                wsGroup.setDeletedAt(null);
+                wsGroup.setUpdatedAt(LocalDateTime.now());
             }else {
-                wsuSer.setDeletedAt(LocalDateTime.now());
+                wsGroup.setDeletedAt(LocalDateTime.now());
             }
 
-            this.repository.save(wsuSer);
+            this.repository.save(wsGroup);
             return new Response(HttpStatus.OK.value(), "Успешно удалено/востановлено");
         }catch (Exception err){
             System.out.println(err.getMessage());
@@ -127,7 +129,7 @@ public class WSUSerService {
     }
 
     /**
-     * Получить пользователя
+     * Получить группу пользователей
      */
 
     public Response findById(Long id){
