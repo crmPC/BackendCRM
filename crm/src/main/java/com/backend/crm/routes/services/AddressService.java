@@ -7,9 +7,11 @@ import com.backend.crm.routes.DTOs.AddressDto;
 import com.backend.crm.routes.DTOs.SortDto;
 import com.backend.crm.routes.models.Address;
 import com.backend.crm.routes.repositories.AddressRepository;
+import com.backend.crm.routes.repositories.AddressSpecifications;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -70,6 +72,14 @@ public class AddressService {
                         dto.getLimit(),
                         Sort.by(dto.getSort().getFirst().getField()).descending());
                 System.out.println("По убыванию");
+            }
+
+            Specification<Address> spec = AddressSpecifications.deletedAtIsNull();
+
+            if (!dto.getSearch().isEmpty()) {
+                spec = spec.and(AddressSpecifications.search(dto.getSearch()));
+
+                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(spec, pageRequest).getContent());
             }
 
             return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(pageRequest).getContent());
