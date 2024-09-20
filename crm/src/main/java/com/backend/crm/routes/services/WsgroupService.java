@@ -8,9 +8,11 @@ import com.backend.crm.routes.DTOs.WSGroupDto;
 import com.backend.crm.routes.DTOs.WSUSerDto;
 import com.backend.crm.routes.models.WSGroup;
 import com.backend.crm.routes.repositories.WsgroupRepository;
+import com.backend.crm.routes.repositories.WsgroupSpecificatios;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -52,6 +54,14 @@ public class WsgroupService {
                 pageRequest = PageRequest.of(dto.getPage() - 1,
                         dto.getLimit(),
                         Sort.by(dto.getSort().getFirst().getField()).descending());
+            }
+
+            Specification<WSGroup> spec = WsgroupSpecificatios.deletedAtIsNull();
+
+            if (!dto.getSearch().isEmpty()) {
+                spec = spec.and(WsgroupSpecificatios.search(dto.getSearch()));
+
+                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(spec, pageRequest).getContent());
             }
 
             return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(pageRequest).getContent());

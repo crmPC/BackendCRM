@@ -3,15 +3,15 @@ package com.backend.crm.routes.services;
 import com.backend.crm.app.config.Mapper;
 import com.backend.crm.app.models.response.types.Response;
 import com.backend.crm.app.models.response.types.ResponseData;
-import com.backend.crm.routes.DTOs.OfficeEquipTypesDto;
 import com.backend.crm.routes.DTOs.SortDto;
 import com.backend.crm.routes.DTOs.VendorDto;
-import com.backend.crm.routes.models.OfficeEquipTypes;
 import com.backend.crm.routes.models.Vendor;
 import com.backend.crm.routes.repositories.VendorRepository;
+import com.backend.crm.routes.repositories.VendorSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -52,6 +52,14 @@ public class VendorService {
                 pageRequest = PageRequest.of(dto.getPage() - 1,
                         dto.getLimit(),
                         Sort.by(dto.getSort().getFirst().getField()).descending());
+            }
+
+            Specification<Vendor> spec = VendorSpecifications.deletedAtIsNull();
+
+            if (!dto.getSearch().isEmpty()) {
+                spec = spec.and(VendorSpecifications.search(dto.getSearch()));
+
+                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(spec, pageRequest).getContent());
             }
 
             return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(pageRequest).getContent());

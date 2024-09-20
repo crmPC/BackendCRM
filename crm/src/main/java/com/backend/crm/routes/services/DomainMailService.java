@@ -6,9 +6,11 @@ import com.backend.crm.routes.DTOs.DomainMailDto;
 import com.backend.crm.routes.DTOs.SortDto;
 import com.backend.crm.routes.models.DomainMail;
 import com.backend.crm.routes.repositories.DomainMailRepository;
+import com.backend.crm.routes.repositories.DomainMailSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +48,14 @@ public class DomainMailService {
                 pageRequest = PageRequest.of(dto.getPage() - 1,
                         dto.getLimit(),
                         Sort.by(dto.getSort().getFirst().getField()).descending());
+            }
+
+            Specification<DomainMail> spec = DomainMailSpecifications.deletedAtIsNull();
+
+            if (!dto.getSearch().isEmpty()) {
+                spec = spec.and(DomainMailSpecifications.search(dto.getSearch()));
+
+                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(spec, pageRequest).getContent());
             }
 
             return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(pageRequest).getContent());

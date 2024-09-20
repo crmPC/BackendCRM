@@ -44,11 +44,11 @@ public class OfficeEquip {
     @Column
     private String model;
 
-    @OneToOne
+    @ManyToOne
     private Company company;
 
     @ManyToOne
-    private OfficeEquipTypes officeEquipType;
+    private OfficeEquipTypes officeequiptypes;
 
     @Column
     private LocalDateTime createdAt;

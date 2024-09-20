@@ -30,5 +30,5 @@ public class OfficeEquipDto {
 
     private Company company;
 
-    private OfficeEquipTypes officeEquipType;
+    private OfficeEquipTypes officeequiptypes;
 }

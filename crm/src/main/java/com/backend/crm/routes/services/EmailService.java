@@ -1,6 +1,5 @@
 package com.backend.crm.routes.services;
 
-import ch.qos.logback.classic.model.processor.LogbackClassicDefaultNestedComponentRules;
 import com.backend.crm.app.config.Mapper;
 import com.backend.crm.app.models.response.types.Response;
 import com.backend.crm.app.models.response.types.ResponseData;
@@ -8,9 +7,11 @@ import com.backend.crm.routes.DTOs.EmailDto;
 import com.backend.crm.routes.DTOs.SortDto;
 import com.backend.crm.routes.models.Email;
 import com.backend.crm.routes.repositories.EmailRepository;
+import com.backend.crm.routes.repositories.EmailSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +51,14 @@ public class EmailService {
                 pageRequest = PageRequest.of(dto.getPage() - 1,
                         dto.getLimit(),
                         Sort.by(dto.getSort().getFirst().getField()).descending());
+            }
+
+            Specification<Email> spec = EmailSpecifications.deletedAtIsNull();
+
+            if (!dto.getSearch().isEmpty()) {
+                spec = spec.and(EmailSpecifications.search(dto.getSearch()));
+
+                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(spec, pageRequest).getContent());
             }
 
             return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(pageRequest).getContent());

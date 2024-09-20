@@ -7,9 +7,11 @@ import com.backend.crm.routes.DTOs.JobTittleDto;
 import com.backend.crm.routes.DTOs.SortDto;
 import com.backend.crm.routes.models.JobTittle;
 import com.backend.crm.routes.repositories.JobTittleRepository;
+import com.backend.crm.routes.repositories.JobTittleSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +51,14 @@ public class JobTittleService {
                 pageRequest = PageRequest.of(dto.getPage() - 1,
                         dto.getLimit(),
                         Sort.by(dto.getSort().getFirst().getField()).descending());
+            }
+
+            Specification<JobTittle> spec = JobTittleSpecifications.deletedAtIsNull();
+
+            if (!dto.getSearch().isEmpty()) {
+                spec = spec.and(JobTittleSpecifications.search(dto.getSearch()));
+
+                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(spec, pageRequest).getContent());
             }
 
             return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(pageRequest).getContent());

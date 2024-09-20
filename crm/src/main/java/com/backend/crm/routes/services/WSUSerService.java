@@ -7,9 +7,11 @@ import com.backend.crm.routes.DTOs.SortDto;
 import com.backend.crm.routes.DTOs.WSUSerDto;
 import com.backend.crm.routes.models.WSUSer;
 import com.backend.crm.routes.repositories.WSUSerRepository;
+import com.backend.crm.routes.repositories.WSUSerSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +51,14 @@ public class WSUSerService {
                 pageRequest = PageRequest.of(dto.getPage() - 1,
                         dto.getLimit(),
                         Sort.by(dto.getSort().getFirst().getField()).descending());
+            }
+
+            Specification<WSUSer> spec = WSUSerSpecifications.deletedAtIsNull();
+
+            if (!dto.getSearch().isEmpty()) {
+                spec = spec.and(WSUSerSpecifications.search(dto.getSearch()));
+
+                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(spec, pageRequest).getContent());
             }
 
             return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(pageRequest).getContent());

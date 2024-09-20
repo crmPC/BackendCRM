@@ -6,9 +6,11 @@ import com.backend.crm.routes.DTOs.CommunicationDto;
 import com.backend.crm.routes.DTOs.SortDto;
 import com.backend.crm.routes.models.Communication;
 import com.backend.crm.routes.repositories.CommunicationRepository;
+import com.backend.crm.routes.repositories.CommunicationSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +48,14 @@ public class CommunicationService {
                 pageRequest = PageRequest.of(dto.getPage() - 1,
                         dto.getLimit(),
                         Sort.by(dto.getSort().getFirst().getField()).descending());
+            }
+
+            Specification<Communication> spec = CommunicationSpecifications.deletedAtIsNull();
+
+            if (!dto.getSearch().isEmpty()) {
+                spec = spec.and(CommunicationSpecifications.search(dto.getSearch()));
+
+                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(spec, pageRequest).getContent());
             }
 
             return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(pageRequest).getContent());

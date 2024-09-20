@@ -2,15 +2,14 @@ package com.backend.crm.routes.services;
 
 import com.backend.crm.app.models.response.types.Response;
 import com.backend.crm.app.models.response.types.ResponseData;
-import com.backend.crm.routes.DTOs.CommunicationDto;
 import com.backend.crm.routes.DTOs.SortDto;
-import com.backend.crm.routes.models.Communication;
 import com.backend.crm.routes.models.Pass;
 import com.backend.crm.routes.repositories.PassRepository;
+import com.backend.crm.routes.repositories.PassSpecifications;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +47,14 @@ public class PassService {
                 pageRequest = PageRequest.of(dto.getPage() - 1,
                         dto.getLimit(),
                         Sort.by(dto.getSort().getFirst().getField()).descending());
+            }
+
+            Specification<Pass> spec = PassSpecifications.deletedAtIsNull();
+
+            if (!dto.getSearch().isEmpty()) {
+                spec = spec.and(PassSpecifications.search(dto.getSearch()));
+
+                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(spec, pageRequest).getContent());
             }
 
             return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(pageRequest).getContent());

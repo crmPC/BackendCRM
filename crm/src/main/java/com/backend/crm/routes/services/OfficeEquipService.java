@@ -7,9 +7,11 @@ import com.backend.crm.routes.DTOs.OfficeEquipDto;
 import com.backend.crm.routes.DTOs.SortDto;
 import com.backend.crm.routes.models.OfficeEquip;
 import com.backend.crm.routes.repositories.OfficeEquipRepository;
+import com.backend.crm.routes.repositories.OfficeEquipSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -51,6 +53,14 @@ public class OfficeEquipService {
                         Sort.by(dto.getSort().getFirst().getField()).descending());
             }
 
+            Specification<OfficeEquip> spec = OfficeEquipSpecifications.deletedAtIsNull();
+
+            if (!dto.getSearch().isEmpty()) {
+                spec = spec.and(OfficeEquipSpecifications.search(dto.getSearch()));
+
+                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(spec, pageRequest).getContent());
+            }
+
             return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(pageRequest).getContent());
         } catch (Exception err) {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
@@ -65,7 +75,7 @@ public class OfficeEquipService {
         try {
             OfficeEquip officeEquip = mapper.getMapper().map(dto, OfficeEquip.class);
             officeEquip.setCreatedAt(LocalDateTime.now());
-
+            
             this.repository.save(officeEquip);
             return new Response(HttpStatus.CREATED.value(), "Успешно сохранено");
         } catch (Exception err) {
