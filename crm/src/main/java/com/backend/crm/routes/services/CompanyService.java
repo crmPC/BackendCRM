@@ -156,7 +156,7 @@ public class CompanyService {
         company.setContactuser(dto.getContactuser());
         company.setDescription(dto.getDescription());
         company.setFormat(dto.getFormat());
-        company.setINN(dto.getINN());
+        company.setInn(dto.getInn());
         company.setDomainAd(dto.getDomainAd());
         company.setEmail_domain(dto.getEmail_domain());
         company.setOfficeequip(dto.getOfficeequip());

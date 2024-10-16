@@ -25,7 +25,7 @@ public class CompanySpecifications {
                                 criteriaBuilder1.like(criteriaBuilder1.lower(root1.get("prefix")), searchPattern),
                                 criteriaBuilder1.like(criteriaBuilder1.lower(root1.get("email_domain")), searchPattern),
                                 criteriaBuilder1.like(criteriaBuilder1.lower(root1.get("description")), searchPattern)
-                                )
+                        )
                 );
             }
 

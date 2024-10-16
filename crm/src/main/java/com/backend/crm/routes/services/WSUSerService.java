@@ -74,6 +74,9 @@ public class WSUSerService {
     public Response save(WSUSerDto dto) {
         try {
             WSUSer wsuSer = mapper.getMapper().map(dto, WSUSer.class);
+
+            wsuSer.setOfficeequip(dto.getOfficeequip());
+            wsuSer.setJobtitle(dto.getJobtitle());
             wsuSer.setCreatedAt(LocalDateTime.now());
 
             this.repository.save(wsuSer);
@@ -97,6 +100,9 @@ public class WSUSerService {
 
             WSUSer wsuSer = current.get();
             wsuSer = mapper.getMapper().map(dto, WSUSer.class);
+
+            wsuSer.setOfficeequip(dto.getOfficeequip());
+            wsuSer.setJobtitle(dto.getJobtitle());
             wsuSer.setUpdatedAt(LocalDateTime.now());
 
             this.repository.save(wsuSer);

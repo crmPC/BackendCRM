@@ -73,9 +73,10 @@ public class EmailService {
 
     public Response save(EmailDto dto){
         try {
+            System.out.println(dto.toString());
+
             Email email = mapper.getMapper().map(dto, Email.class);
             email.setCreatedAt(LocalDateTime.now());
-            email.setDomainMail(dto.getDomainmail());
 
             this.repository.save(email);
             return new Response(HttpStatus.CREATED.value(), "Успешно сохранено");
@@ -98,7 +99,6 @@ public class EmailService {
 
             Email email = current.get();
             email.setName(dto.getName());
-            email.setDomainMail(dto.getDomainmail());
             email.setPassword(dto.getPassword());
             email.setUpdatedAt(LocalDateTime.now());
 

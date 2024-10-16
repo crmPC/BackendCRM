@@ -20,8 +20,6 @@ public class ColumnController {
 
     @PostMapping
     public Response saveColumn(@RequestBody Object object, @RequestHeader String Authorization){
-        System.out.println(object.toString());
-        System.out.println(Authorization);
         return this.service.saveColumn(object);
     }
 }

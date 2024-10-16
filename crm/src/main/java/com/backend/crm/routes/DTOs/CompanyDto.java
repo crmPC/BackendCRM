@@ -20,7 +20,7 @@ public class CompanyDto {
 
     private FormatEnum format;
 
-    private String INN;
+    private String inn;
 
     private String prefix;
 

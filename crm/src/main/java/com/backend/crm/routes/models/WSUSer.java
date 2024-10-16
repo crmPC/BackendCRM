@@ -19,20 +19,23 @@ public class WSUSer{
     @Column
     private LocalDate dob;
 
-    @OneToOne
+    @ManyToOne
     private Company company;
 
     @ManyToOne
     private Email email;
 
-    @OneToOne
-    private OfficeEquip officeEquip;
+    @ManyToOne
+    private OfficeEquip officeequip;
 
     @ManyToOne
-    private JobTittle jobTittle;
+    private JobTittle jobtitle;
 
-    @OneToOne
+    @ManyToOne
     private Pass pass;
+
+    @ManyToOne
+    private Communication communication;
 
     @Column
     private String prim;
@@ -40,32 +43,8 @@ public class WSUSer{
     @Column
     private String password;
 
-    @ElementCollection
-    private String[] objectClass;
-
-    @Column
-    private String member;
-
-    @Column
-    private String cn;
-
-    @Column
-    private String sn;
-
-    @Column
-    private String displayName;
-
-    @ElementCollection
-    private String[] memberOf;
-
     @Column
     private String name;
-
-    @Column
-    private String objectGUID;
-
-    @Column
-    private String userPrincipalName;
 
     @ManyToOne
     private DomainAd domainAd;

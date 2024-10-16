@@ -22,7 +22,7 @@ public class Email {
     private String password;
 
     @ManyToOne
-    private DomainMail domainMail;
+    private DomainMail domainmail;
 
     @Column
     private LocalDateTime createdAt;

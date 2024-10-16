@@ -14,11 +14,11 @@ public class WSUSerDto {
 
     private String prim;
 
-    private JobTittle jobTittle;
+    private JobTittle jobtitle;
 
     private Company company;
 
-    private OfficeEquip officeEquip;
+    private OfficeEquip officeequip;
 
     private Email email;
 

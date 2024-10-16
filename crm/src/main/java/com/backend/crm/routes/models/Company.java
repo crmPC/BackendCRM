@@ -27,14 +27,14 @@ public class Company {
     @ManyToOne
     private WSUSer contactuser;
 
-    @OneToOne
+    @ManyToOne
     private Address address;
 
     @Column
     private FormatEnum format;
 
-    @Column
-    private String INN;
+    @Column(name = "inn")
+    private String inn;
 
     @Column
     private String prefix;
