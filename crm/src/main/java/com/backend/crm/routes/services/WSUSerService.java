@@ -3,6 +3,7 @@ package com.backend.crm.routes.services;
 import com.backend.crm.app.config.Mapper;
 import com.backend.crm.app.models.response.types.Response;
 import com.backend.crm.app.models.response.types.ResponseData;
+import com.backend.crm.routes.DTOs.AuthUserDto;
 import com.backend.crm.routes.DTOs.SortDto;
 import com.backend.crm.routes.DTOs.WSUSerDto;
 import com.backend.crm.routes.models.WSUSer;
@@ -73,6 +74,10 @@ public class WSUSerService {
 
     public Response save(WSUSerDto dto) {
         try {
+            if (this.repository.findWSUSerByLogin(dto.getLogin()) != null){
+                return new Response(HttpStatus.CONFLICT.value(), "Такой логин уже есть");
+            }
+
             WSUSer wsuSer = mapper.getMapper().map(dto, WSUSer.class);
 
             wsuSer.setOfficeequip(dto.getOfficeequip());
@@ -92,6 +97,10 @@ public class WSUSerService {
 
     public Response saveEdit(Long id, WSUSerDto dto) {
         try {
+            if (this.repository.findWSUSerByLogin(dto.getLogin()) != null){
+                return new Response(HttpStatus.CONFLICT.value(), "Такой логин уже есть");
+            }
+
             Optional<WSUSer> current = this.repository.findById(id);
 
             if (current.isEmpty()) {

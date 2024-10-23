@@ -29,7 +29,8 @@ public class WSUSerSpecifications {
                                 criteriaBuilder1.like(criteriaBuilder1.lower(root1.get("sn")), searchPattern),
                                 criteriaBuilder1.like(criteriaBuilder1.lower(root1.get("displayName")), searchPattern),
                                 criteriaBuilder1.like(criteriaBuilder1.lower(root1.get("name")), searchPattern),
-                                criteriaBuilder1.like(criteriaBuilder1.lower(root1.get("userPrincipalName")), searchPattern)
+                                criteriaBuilder1.like(criteriaBuilder1.lower(root1.get("userPrincipalName")), searchPattern),
+                                criteriaBuilder1.like(criteriaBuilder1.lower(root1.get("login")), searchPattern)
                         )
                 );
             }

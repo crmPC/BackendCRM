@@ -44,4 +44,7 @@ public class DomainAd {
 
     @Column
     private String prim;
+
+    @ManyToOne
+    private Log log;
 }

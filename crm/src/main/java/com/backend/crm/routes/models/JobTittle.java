@@ -31,6 +31,9 @@ public class JobTittle {
     @Column
     private LocalDateTime deletedAt;
 
+    @ManyToOne
+    private Log log;
+
     public JobTittle(String description, String name, LocalDateTime createdAt) {
         this.description = description;
         this.name = name;

@@ -29,4 +29,7 @@ public class DomainMail {
 
     @Column
     private LocalDateTime deletedAt;
+
+    @ManyToOne
+    private Log log;
 }

@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface WSUSerRepository extends JpaRepository<WSUSer, Long>, JpaSpecificationExecutor<WSUSer> {
+    WSUSer findWSUSerByLogin(String login);
 }

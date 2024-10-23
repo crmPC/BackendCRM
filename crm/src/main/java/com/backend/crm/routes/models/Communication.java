@@ -36,6 +36,9 @@ public class Communication {
     @Column
     private LocalDateTime deletedAt;
 
+    @ManyToOne
+    private Log log;
+
     public Communication(CommunicationTypeEnum type, String value) {
         this.type = type;
         this.value = value;

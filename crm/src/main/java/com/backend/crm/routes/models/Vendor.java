@@ -26,4 +26,7 @@ public class Vendor {
 
     @Column
     private LocalDateTime deletedAt;
+
+    @ManyToOne
+    private Log log;
 }

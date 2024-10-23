@@ -1,6 +1,7 @@
 package com.backend.crm.app.domain;
 
 import com.backend.crm.routes.models.UserEntity;
+import com.backend.crm.routes.models.WSUSer;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -12,10 +13,10 @@ import java.util.Date;
 @Component
 public class TokenService {
     @Value("${app.jwtSecret}")
-    private String jwtSecret;
+    private static String jwtSecret;
 
     @Value("${app.jwtExpirationInHr}")
-    private int jwtExpirationInHr;
+    private static int jwtExpirationInHr;
 
     public String generateToken(UserEntity userPrincipal) {
 //        UserEntity userPrincipal = (UserEntity) authentication.getPrincipal();

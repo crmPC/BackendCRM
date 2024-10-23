@@ -48,8 +48,8 @@ public class UserService {
             user.setLogin(userDto.getLogin());
             user.setPassword(PasswordUtils.encodePassword(userDto.getPassword()));
 
-            System.out.println(user.toString());
             this.repositories.save(user);
+
             return new ResponseData<>(HttpStatus.OK.value(),
                     "Успешно зарегестрирован",
                     this.tokenService.generateToken(user));

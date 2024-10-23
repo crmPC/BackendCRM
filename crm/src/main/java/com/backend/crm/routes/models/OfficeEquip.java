@@ -58,4 +58,7 @@ public class OfficeEquip {
 
     @Column
     private LocalDateTime deletedAt;
+
+    @ManyToOne
+    private Log log;
 }

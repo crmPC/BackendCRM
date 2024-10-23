@@ -19,6 +19,9 @@ public class WSUSer{
     @Column
     private LocalDate dob;
 
+    @Column
+    private String login;
+
     @ManyToOne
     private Company company;
 
@@ -57,4 +60,7 @@ public class WSUSer{
 
     @Column
     private LocalDateTime deletedAt;
+
+    @ManyToOne
+    private Log log;
 }
