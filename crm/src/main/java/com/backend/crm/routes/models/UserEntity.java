@@ -38,5 +38,5 @@ public class UserEntity {
 
     @Column
     @Enumerated(EnumType.STRING)
-    private UserRole userRole = UserRole.NOT_ACTIVATED;
+    private UserRole userRole;
 }

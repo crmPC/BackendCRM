@@ -3,6 +3,7 @@ package com.backend.crm.routes.services;
 import com.backend.crm.app.config.Mapper;
 import com.backend.crm.app.models.response.types.Response;
 import com.backend.crm.app.models.response.types.ResponseData;
+import com.backend.crm.app.utils.PasswordUtils;
 import com.backend.crm.routes.DTOs.AuthUserDto;
 import com.backend.crm.routes.DTOs.SortDto;
 import com.backend.crm.routes.DTOs.WSUSerDto;
@@ -74,15 +75,13 @@ public class WSUSerService {
 
     public Response save(WSUSerDto dto) {
         try {
-            if (this.repository.findWSUSerByLogin(dto.getLogin()) != null){
-                return new Response(HttpStatus.CONFLICT.value(), "Такой логин уже есть");
-            }
-
             WSUSer wsuSer = mapper.getMapper().map(dto, WSUSer.class);
 
             wsuSer.setOfficeequip(dto.getOfficeequip());
             wsuSer.setJobtitle(dto.getJobtitle());
             wsuSer.setCreatedAt(LocalDateTime.now());
+
+            wsuSer.setPassword(PasswordUtils.encodePassword(dto.getPassword()));
 
             this.repository.save(wsuSer);
             return new Response(HttpStatus.CREATED.value(), "Успешно сохранено");
@@ -97,10 +96,6 @@ public class WSUSerService {
 
     public Response saveEdit(Long id, WSUSerDto dto) {
         try {
-            if (this.repository.findWSUSerByLogin(dto.getLogin()) != null){
-                return new Response(HttpStatus.CONFLICT.value(), "Такой логин уже есть");
-            }
-
             Optional<WSUSer> current = this.repository.findById(id);
 
             if (current.isEmpty()) {
@@ -113,6 +108,8 @@ public class WSUSerService {
             wsuSer.setOfficeequip(dto.getOfficeequip());
             wsuSer.setJobtitle(dto.getJobtitle());
             wsuSer.setUpdatedAt(LocalDateTime.now());
+
+            wsuSer.setPassword(PasswordUtils.encodePassword(dto.getPassword()));
 
             this.repository.save(wsuSer);
             return new Response(HttpStatus.OK.value(), "Успешно сохранено");
@@ -161,6 +158,15 @@ public class WSUSerService {
                     this.repository.findById(id).get());
         }catch (Exception err){
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+        }
+    }
+
+    public WSUSer findWSUSerByIdForLogger(Long id){
+        try {
+            return this.repository.findById(id).get();
+        }catch (Exception err){
+            System.out.println(err.getMessage());
+            return null;
         }
     }
 }

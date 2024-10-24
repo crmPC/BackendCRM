@@ -1,11 +1,14 @@
 package com.backend.crm.routes.services;
 
 import com.backend.crm.app.config.Mapper;
+import com.backend.crm.app.domain.TokenService;
 import com.backend.crm.app.models.response.types.Response;
 import com.backend.crm.app.models.response.types.ResponseData;
 import com.backend.crm.routes.DTOs.AddressDto;
 import com.backend.crm.routes.DTOs.SortDto;
 import com.backend.crm.routes.models.Address;
+import com.backend.crm.routes.models.Log;
+import com.backend.crm.routes.models.WSUSer;
 import com.backend.crm.routes.repositories.AddressRepository;
 import com.backend.crm.routes.repositories.AddressSpecifications;
 import lombok.AllArgsConstructor;
@@ -31,15 +34,26 @@ public class AddressService {
 
     private final Mapper mapper;
 
+    //private final TokenService tokenService;
+
     /**
      * Создать новый адрес
      * */
 
-    public Response save(AddressDto dto){
+    public Response save(AddressDto dto, String token){
         try {
             if (dto == null){
                 return new Response(HttpStatus.NO_CONTENT.value(), "dto - пусто");
             }
+//
+//            if (!tokenService.validateToken(token)){
+//                return new Response(HttpStatus.UNAUTHORIZED.value(), "Время действия авторизации истекло");
+//            }
+//
+//            WSUSer user = userService.findWSUSerByIdForLogger(tokenService.getUserIdFromJWT(token));
+//
+//            Log log = new Log();
+//            log.setTime(LocalDateTime.now());
 
             Address address = mapper.getMapper().map(dto, Address.class);
             address.setCreatedAt(LocalDateTime.now());

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -41,7 +42,7 @@ public class Address {
 
     @Column
     private LocalDateTime deletedAt;
-
-    @ManyToOne
-    private Log log;
+//
+//    @ManyToMany
+//    private List<Log> log;
 }

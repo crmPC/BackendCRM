@@ -21,23 +21,21 @@ public class UserController {
 
     @PostMapping("/signup")
     public Response signup(@RequestBody AuthUserDto userDto){
-        System.out.println(userDto.toString());
         return this.service.signup(userDto);
     }
 
-    @GetMapping("/{id}")
-    public Response getUser(@RequestHeader String Authorization, @PathVariable Long id){
-        return this.service.getUser(Authorization, id);
-    }
+//    @GetMapping("/{id}")
+//    public Response getUser(@RequestHeader String Authorization, @PathVariable Long id){
+//        return this.service.getUser(Authorization, id);
+//    }
 
     @PostMapping("/login")
     public Response authUser(@RequestBody AuthUserDto userDto){
-        System.out.println(userDto.toString());
         return this.service.loginUser(userDto);
     }
 
-    @PostMapping("/ban/{id}")
-    public Response banUser(@PathVariable Long id, @RequestHeader String Authorization, @RequestBody String BanReason){
-        return this.service.banUser(Authorization, id, BanReason);
-    }
+//    @PostMapping("/ban/{id}")
+//    public Response banUser(@PathVariable Long id, @RequestHeader String Authorization, @RequestBody String BanReason){
+//        return this.service.banUser(Authorization, id, BanReason);
+//    }
 }

@@ -13,13 +13,12 @@ import java.util.Date;
 @Component
 public class TokenService {
     @Value("${app.jwtSecret}")
-    private static String jwtSecret;
+    private String jwtSecret;
 
     @Value("${app.jwtExpirationInHr}")
-    private static int jwtExpirationInHr;
+    private int jwtExpirationInHr;
 
     public String generateToken(UserEntity userPrincipal) {
-//        UserEntity userPrincipal = (UserEntity) authentication.getPrincipal();
 
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + (3600000 * jwtExpirationInHr));

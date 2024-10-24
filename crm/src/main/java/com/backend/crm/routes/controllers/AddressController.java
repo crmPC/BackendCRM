@@ -18,31 +18,31 @@ public class AddressController {
 
     @Operation(summary = "Создать новый адресс")
     @PostMapping
-    public Response saveAddress(@RequestBody AddressDto addressDto){
-        return this.service.save(addressDto);
+    public Response saveAddress(@RequestHeader("Authorization") String authorization, @RequestBody AddressDto addressDto){
+        return this.service.save(addressDto, authorization);
     }
 
     @Operation(summary = "Получить все адреса с сортровкой (передается параметром)")
     @PostMapping("/all")
-    public Response findAllAddressBySort(@RequestBody SortDto sortDto){
+    public Response findAllAddressBySort(@RequestHeader("Authorization") String authorization, @RequestBody SortDto sortDto){
         return this.service.findAllBySort(sortDto);
     }
 
     @Operation(summary = "Изменить существующий адрес")
     @PutMapping
-    public Response saveEditAddress(@RequestBody AddressDto addressDto, @RequestParam("id") Long id){
+    public Response saveEditAddress(@RequestHeader("Authorization") String authorization, @RequestBody AddressDto addressDto, @RequestParam("id") Long id){
         return this.service.saveEdit(addressDto, id);
     }
 
     @Operation(summary = "Найти адрес")
     @GetMapping
-    public Response findAddressById(@RequestParam("id") Long id){
+    public Response findAddressById(@RequestHeader("Authorization") String authorization, @RequestParam("id") Long id){
         return this.service.findById(id);
     }
 
     @Operation(summary = "Удалить адрес")
     @DeleteMapping
-    public Response deleteAddressById(@RequestParam("id") Long id){
+    public Response deleteAddressById(@RequestHeader("Authorization") String authorization, @RequestParam("id") Long id){
         return this.service.deleteById(id);
     }
 }

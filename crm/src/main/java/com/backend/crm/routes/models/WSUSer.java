@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -18,9 +19,6 @@ public class WSUSer{
 
     @Column
     private LocalDate dob;
-
-    @Column
-    private String login;
 
     @ManyToOne
     private Company company;
@@ -46,9 +44,6 @@ public class WSUSer{
     @Column
     private String password;
 
-    @Column
-    private String name;
-
     @ManyToOne
     private DomainAd domainAd;
 
@@ -61,6 +56,6 @@ public class WSUSer{
     @Column
     private LocalDateTime deletedAt;
 
-    @ManyToOne
-    private Log log;
+//    @ManyToMany
+//    private List<Log> log;
 }

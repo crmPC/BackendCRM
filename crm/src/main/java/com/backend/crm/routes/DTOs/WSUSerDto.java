@@ -12,8 +12,6 @@ public class WSUSerDto {
 
     private LocalDate dob;
 
-    private String login;
-
     private String prim;
 
     private JobTittle jobtitle;
