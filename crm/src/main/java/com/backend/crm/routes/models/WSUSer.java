@@ -44,6 +44,9 @@ public class WSUSer{
     @Column
     private String password;
 
+    @Column
+    private String cn;
+
     @ManyToOne
     private DomainAd domainAd;
 

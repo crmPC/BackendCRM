@@ -1,8 +1,8 @@
 package com.backend.crm.routes.models;
 
 public enum UserRole {
-    SUPER_ADMIN,
-    MODERATOR,
-    ADMIN,
-    NOT_ACTIVATED
+    super_admin,
+    moderator,
+    admin,
+    not_activated
 }

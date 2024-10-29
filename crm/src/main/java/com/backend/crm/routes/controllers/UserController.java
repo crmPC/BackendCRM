@@ -4,6 +4,7 @@ import com.backend.crm.app.models.response.types.Response;
 import com.backend.crm.routes.DTOs.AuthUserDto;
 import com.backend.crm.routes.DTOs.BanUserDto;
 import com.backend.crm.routes.DTOs.SignupUserDto;
+import com.backend.crm.routes.DTOs.SortDto;
 import com.backend.crm.routes.services.UserService;
 
 
@@ -24,10 +25,15 @@ public class UserController {
         return this.service.signup(userDto);
     }
 
-//    @GetMapping("/{id}")
-//    public Response getUser(@RequestHeader String Authorization, @PathVariable Long id){
-//        return this.service.getUser(Authorization, id);
-//    }
+    @PostMapping("/all")
+    public Response findAll(@RequestHeader("Authorization") String authorization, @RequestBody SortDto sortDto){
+        return this.service.findAllBySort(sortDto, authorization);
+    }
+
+    @GetMapping
+    public Response getUser(@RequestHeader String Authorization, @RequestParam("id") Long id){
+        return this.service.getUser(Authorization, id);
+    }
 
     @PostMapping("/login")
     public Response authUser(@RequestBody AuthUserDto userDto){

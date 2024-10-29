@@ -6,14 +6,20 @@ import com.backend.crm.app.models.response.types.ResponseData;
 import com.backend.crm.app.utils.PasswordUtils;
 import com.backend.crm.routes.DTOs.AuthUserDto;
 import com.backend.crm.routes.DTOs.SignupUserDto;
+import com.backend.crm.routes.DTOs.SortDto;
 import com.backend.crm.routes.models.UserEntity;
 import com.backend.crm.routes.models.UserRole;
 import com.backend.crm.routes.models.WSUSer;
 import com.backend.crm.routes.repositories.UserRepositories;
+import com.backend.crm.routes.repositories.UserSpecifications;
 import com.backend.crm.routes.repositories.WSUSerRepository;
+import com.backend.crm.routes.repositories.WSUSerSpecifications;
 import com.backend.crm.routes.response.ResponseUserInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cglib.core.Local;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +35,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepositories repositories;
+    private final UserRepositories repository;
 
     private final TokenService tokenService;
 
@@ -43,7 +49,7 @@ public class UserService {
                 return new Response(HttpStatus.NO_CONTENT.value(), "Данные о пользователе пусты");
             }
 
-            if (this.repositories.findByLogin(userDto.getLogin()) != null) {
+            if (this.repository.findByLogin(userDto.getLogin()) != null) {
                 return new Response(HttpStatus.CONFLICT.value(), "Пользователь с таким Login уже существует");
             }
 
@@ -51,9 +57,9 @@ public class UserService {
 
             user.setLogin(userDto.getLogin());
             user.setPassword(PasswordUtils.encodePassword(userDto.getPassword()));
-            user.setUserRole(UserRole.NOT_ACTIVATED);
+            user.setUserRole(UserRole.not_activated);
 
-            this.repositories.save(user);
+            this.repository.save(user);
             return new ResponseData<>(HttpStatus.OK.value(),
                     "Успешно зарегестрирован",
                     this.tokenService.generateToken(user));
@@ -68,7 +74,7 @@ public class UserService {
 
     public Response loginUser(AuthUserDto dto){
         try {
-            UserEntity user = this.repositories.findByLogin(dto.getLogin());
+            UserEntity user = this.repository.findByLogin(dto.getLogin());
 
             if (user == null){
                 return new Response(HttpStatus.NO_CONTENT.value(), "Пользователя с таким login нет");
@@ -80,6 +86,42 @@ public class UserService {
 
             return new ResponseData<>(HttpStatus.OK.value(), "Успешно авторизован", this.tokenService.generateToken(user));
         }catch (Exception err){
+            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+        }
+    }
+
+    /**
+     * Получить всех пользователей
+     */
+
+    public Response findAllBySort(SortDto dto, String token) {
+        try {
+            if (dto.getSort().isEmpty()){
+                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll());
+            }
+
+            PageRequest pageRequest;
+
+            if (dto.getSort().getFirst().getSortDir().equals("asc")) {
+                pageRequest = PageRequest.of(dto.getPage() - 1,
+                        dto.getLimit(),
+                        Sort.by(dto.getSort().getFirst().getField()).ascending());
+            } else {
+                pageRequest = PageRequest.of(dto.getPage() - 1,
+                        dto.getLimit(),
+                        Sort.by(dto.getSort().getFirst().getField()).descending());
+            }
+
+            Specification<UserEntity> spec = UserSpecifications.deletedAtIsNull();
+
+            if (!dto.getSearch().isEmpty()) {
+                spec = spec.and(UserSpecifications.search(dto.getSearch()));
+
+                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(pageRequest).getContent());
+            }
+
+            return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(pageRequest).getContent());
+        } catch (Exception err) {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
         }
     }
@@ -121,39 +163,39 @@ public class UserService {
      * Получить пользователя (Может сделать только админ)
      * */
 
-//    public Response getUser(String Authorization, Long id) {
-//        try {
-//            if (Authorization.isEmpty()) {
-//                return new Response(HttpStatus.NO_CONTENT.value(), "Токен отсуствует");
-//            }
-//
-//            if (id == null){
-//                return new Response(HttpStatus.NO_CONTENT.value(), "id пользователя пустое");
-//            }
-//
-//            if (!this.tokenService.validateToken(Authorization)){
-//                return new Response(HttpStatus.UNAUTHORIZED.value(), "Токен истек");
-//            }
-//
-//            UserEntity admin = this.repositories.findById(this.tokenService.getUserIdFromJWT(Authorization)).get();
+    public Response getUser(String Authorization, Long id) {
+        try {
+            if (Authorization.isEmpty()) {
+                return new Response(HttpStatus.NO_CONTENT.value(), "Токен отсуствует");
+            }
+
+            if (id == null){
+                return new Response(HttpStatus.NO_CONTENT.value(), "id пользователя пустое");
+            }
+
+            if (!this.tokenService.validateToken(Authorization)){
+                return new Response(HttpStatus.UNAUTHORIZED.value(), "Токен истек");
+            }
+
+//            UserEntity admin = this.repository.findById(this.tokenService.getUserIdFromJWT(Authorization)).get();
 //
 //            if (admin.getUserRole() != UserRole.ADMIN){
 //                return new Response(HttpStatus.FORBIDDEN.value(), "Нет прав на получение пользователя");
 //            }
-//
-//            UserEntity user = this.repositories.findById(id).get();
-//
-//            if (user == null){
-//                return new Response(HttpStatus.NOT_FOUND.value(), "Такого пользователя нет");
-//            }
-//
-//            return new ResponseData<>(HttpStatus.OK.value(),
-//                    "Успешно получен",
-//                    new ResponseUserInfo(user));
-//        } catch (Exception err) {
-//            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
-//        }
-//    }
+
+            UserEntity user = this.repository.findById(id).get();
+
+            if (user == null){
+                return new Response(HttpStatus.NOT_FOUND.value(), "Такого пользователя нет");
+            }
+
+            return new ResponseData<>(HttpStatus.OK.value(),
+                    "Успешно получен",
+                    new ResponseUserInfo(user));
+        } catch (Exception err) {
+            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+        }
+    }
 
     private UserEntity create(SignupUserDto userDto) {
         UserEntity user = new UserEntity();
