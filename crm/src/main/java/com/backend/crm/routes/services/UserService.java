@@ -1,12 +1,11 @@
 package com.backend.crm.routes.services;
 
+import com.backend.crm.app.config.Mapper;
 import com.backend.crm.app.domain.TokenService;
 import com.backend.crm.app.models.response.types.Response;
 import com.backend.crm.app.models.response.types.ResponseData;
 import com.backend.crm.app.utils.PasswordUtils;
-import com.backend.crm.routes.DTOs.AuthUserDto;
-import com.backend.crm.routes.DTOs.SignupUserDto;
-import com.backend.crm.routes.DTOs.SortDto;
+import com.backend.crm.routes.DTOs.*;
 import com.backend.crm.routes.models.UserEntity;
 import com.backend.crm.routes.models.UserRole;
 import com.backend.crm.routes.models.WSUSer;
@@ -39,6 +38,8 @@ public class UserService {
 
     private final TokenService tokenService;
 
+    private final Mapper mapper;
+
     /**
      * Заргестрировать пользователя
      * */
@@ -58,6 +59,7 @@ public class UserService {
             user.setLogin(userDto.getLogin());
             user.setPassword(PasswordUtils.encodePassword(userDto.getPassword()));
             user.setUserRole(UserRole.not_activated);
+            user.setCreatedAt(LocalDateTime.now());
 
             this.repository.save(user);
             return new ResponseData<>(HttpStatus.OK.value(),
@@ -130,11 +132,11 @@ public class UserService {
      * Заблокировать пользователя (может сделать только админ)
      * */
 
-//    public Response banUser(String Authorization, Long id, String BanReason){
-//        try {
-//            Optional<UserEntity> CurrentAdmin = this.repositories.findById(
+    public Response banUser(String Authorization, BanUserDto BanReason){
+        try {
+//            Optional<UserEntity> CurrentAdmin = this.repository.findById(
 //                    this.tokenService.getUserIdFromJWT(Authorization));
-//
+
 //            if (CurrentAdmin.isEmpty()){
 //                return new Response(HttpStatus.UNAUTHORIZED.value(), "Проблема авторизации админа");
 //            }
@@ -142,22 +144,30 @@ public class UserService {
 //            if (CurrentAdmin.get().getUserRole() != UserRole.ADMIN){
 //                return new Response(HttpStatus.FORBIDDEN.value(), "Не является админом");
 //            }
-//
-//            UserEntity user = this.repositories.findById(id).get();
-//
-//            if (user == null){
-//                return new Response(HttpStatus.NOT_FOUND.value(), "Такого пользователя нет");
-//            }
-//
-//            user.setBanned(true);
-//            user.setBanReason(BanReason);
-//            this.repositories.save(user);
-//
-//            return new Response(HttpStatus.OK.value(), "Пользователь успешно заблокирован");
-//        }catch (Exception err){
-//            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
-//        }
-//    }
+
+            UserEntity user = this.repository.findById(BanReason.getIdUser()).get();
+
+            if (user == null){
+                return new Response(HttpStatus.NOT_FOUND.value(), "Такого пользователя нет");
+            }
+
+            if (user.getBanned()){
+                user.setBanned(false);
+                user.setBanReason(null);
+
+                this.repository.save(user);
+                return new Response(HttpStatus.OK.value(), "Пользователь успешно разблокирован");
+            }
+
+            user.setBanned(true);
+            user.setBanReason(BanReason.getBanReason());
+            this.repository.save(user);
+
+            return new Response(HttpStatus.OK.value(), "Пользователь успешно заблокирован");
+        }catch (Exception err){
+            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+        }
+    }
 
     /**
      * Получить пользователя (Может сделать только админ)
@@ -197,15 +207,56 @@ public class UserService {
         }
     }
 
-    private UserEntity create(SignupUserDto userDto) {
-        UserEntity user = new UserEntity();
+    /**
+     * Изменить пользователя
+     */
 
-        user.setName(userDto.getName());
-        user.setSurname(userDto.getSurname());
-        user.setPatronymic(userDto.getPatronymic());
-        user.setDob(userDto.getDob());
-        user.setLogin(userDto.getLogin());
+    public Response saveEdit(Long id, UserDto dto) {
+        try {
+            Optional<UserEntity> current = this.repository.findById(id);
 
-        return user;
+            if (current.isEmpty()) {
+                return new Response(HttpStatus.NOT_FOUND.value(), "Такого пользователя нет");
+            }
+
+            UserEntity user = current.get();
+
+            mapper.getMapper().map(dto, user);
+            user.setUpdatedAt(LocalDateTime.now());
+
+            this.repository.save(user);
+            return new Response(HttpStatus.OK.value(), "Успешно сохранено");
+        } catch (Exception err) {
+            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+        }
+    }
+
+    /**
+     * Удалить пользователя
+     */
+
+    public Response deleteById(Long id){
+        try {
+            Optional<UserEntity> current = this.repository.findById(id);
+
+            if (current.isEmpty()){
+                return new Response(HttpStatus.NOT_FOUND.value(), "Такого пользователя нет");
+            }
+
+            UserEntity user = current.get();
+
+            if (user.getDeletedAt() != null){
+                user.setDeletedAt(null);
+                user.setUpdatedAt(LocalDateTime.now());
+            }else {
+                user.setDeletedAt(LocalDateTime.now());
+            }
+
+            this.repository.save(user);
+            return new Response(HttpStatus.OK.value(), "Успешно удалено/востановлено");
+        }catch (Exception err){
+            System.out.println(err.getMessage());
+            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+        }
     }
 }

@@ -31,7 +31,7 @@ public class ResponseUserInfo {
         this.surname = user.getSurname();
         this.patronymic = user.getPatronymic();
         this.dob = user.getDob();
-        this.banned = user.isBanned();
+        this.banned = user.getBanned();
         this.banReason = user.getBanReason();
         this.userRole = user.getUserRole();
     }

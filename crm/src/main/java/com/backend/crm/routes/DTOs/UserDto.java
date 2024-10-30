@@ -1,56 +1,38 @@
-package com.backend.crm.routes.models;
+package com.backend.crm.routes.DTOs;
 
-import jakarta.persistence.*;
+import com.backend.crm.routes.models.UserRole;
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Data;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
 
 @Data
-@Entity
-public class UserEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idUser;
+public class UserDto {
 
-    @Column
     private String name;
 
-    @Column
     private String surname;
 
-    @Column
     private String patronymic;
 
-    @Column
     private Date dob;
 
-    @Column
     private String login;
 
-    @Column
     private String password;
 
-    @Column
     private boolean banned = false;
 
-    @Column
     private String banReason;
 
-    @Column
     private LocalDateTime createdAt;
 
-    @Column
     private LocalDateTime updatedAt;
 
-    @Column
     private LocalDateTime deletedAt;
 
-    @Column
-    @Enumerated(EnumType.STRING)
     private UserRole userRole;
-
-    public boolean getBanned() {
-        return banned;
-    }
 }

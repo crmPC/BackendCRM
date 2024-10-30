@@ -1,13 +1,11 @@
 package com.backend.crm.routes.controllers;
 
 import com.backend.crm.app.models.response.types.Response;
-import com.backend.crm.routes.DTOs.AuthUserDto;
-import com.backend.crm.routes.DTOs.BanUserDto;
-import com.backend.crm.routes.DTOs.SignupUserDto;
-import com.backend.crm.routes.DTOs.SortDto;
+import com.backend.crm.routes.DTOs.*;
 import com.backend.crm.routes.services.UserService;
 
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
@@ -40,8 +38,20 @@ public class UserController {
         return this.service.loginUser(userDto);
     }
 
-//    @PostMapping("/ban/{id}")
-//    public Response banUser(@PathVariable Long id, @RequestHeader String Authorization, @RequestBody String BanReason){
-//        return this.service.banUser(Authorization, id, BanReason);
-//    }
+    @PutMapping("/ban")
+    public Response banUser(@RequestHeader String Authorization, @RequestBody BanUserDto BanReason){
+        return this.service.banUser(Authorization, BanReason);
+    }
+
+    @PutMapping
+    @Operation(summary = "Изменить пользователя")
+    public Response editWSUSer(@RequestParam("id") Long id, @RequestBody UserDto dto){
+        return this.service.saveEdit(id, dto);
+    }
+
+    @DeleteMapping
+    @Operation(summary = "Удалить пользователя")
+    public Response deleteWSUSerById(@RequestParam Long id){
+        return this.service.deleteById(id);
+    }
 }
