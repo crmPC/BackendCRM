@@ -3,6 +3,8 @@ package com.backend.crm.routes.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @Entity
 public class AllowedIp {
@@ -15,4 +17,14 @@ public class AllowedIp {
 
     @Column
     private String prim;
+
+    @Column
+    private LocalDateTime createdAt;
+
+    @Column
+    private LocalDateTime updatedAt;
+
+    @Column
+    private LocalDateTime deletedAt;
+
 }

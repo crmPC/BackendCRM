@@ -3,6 +3,8 @@ package com.backend.crm.routes.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @Entity
 public class AccessUsersCompany{
@@ -11,8 +13,17 @@ public class AccessUsersCompany{
     private Long idAccessUsersCompany;
 
     @ManyToOne
-    private UserEntity userEntity;
+    private UserEntity user;
 
     @ManyToOne
     private Company company;
+
+    @Column
+    private LocalDateTime createdAt;
+
+    @Column
+    private LocalDateTime updatedAt;
+
+    @Column
+    private LocalDateTime deletedAt;
 }

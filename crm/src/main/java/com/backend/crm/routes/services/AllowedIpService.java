@@ -3,16 +3,12 @@ package com.backend.crm.routes.services;
 import com.backend.crm.app.config.Mapper;
 import com.backend.crm.app.models.response.types.Response;
 import com.backend.crm.app.models.response.types.ResponseData;
-import com.backend.crm.routes.DTOs.AccessUsersCompanyDto;
 import com.backend.crm.routes.DTOs.AllowedIpDto;
 import com.backend.crm.routes.DTOs.SortDto;
-import com.backend.crm.routes.models.AccessUsersCompany;
-import com.backend.crm.routes.models.Address;
-import com.backend.crm.routes.models.WSUSer;
-import com.backend.crm.routes.repositories.AccessUsersCompanyRepository;
-import com.backend.crm.routes.repositories.WSUSerSpecifications;
-import lombok.AllArgsConstructor;
-import org.springframework.cglib.core.Local;
+import com.backend.crm.routes.models.AllowedIp;
+import com.backend.crm.routes.repositories.AllowedIpRepository;
+import com.backend.crm.routes.repositories.AllowedIpSpecifications;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -22,19 +18,24 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-@Service
-@AllArgsConstructor
-public class AccessUsersCompanyService {
+/**
+ * ## Сервис IP LDAP
+ *
+ * @author Горелов Дмитрий
+ */
 
-    private final AccessUsersCompanyRepository repository;
+@Service
+@RequiredArgsConstructor
+public class AllowedIpService {
+    private final AllowedIpRepository repository;
 
     private final Mapper mapper;
 
     /**
-     * Получить всех адиминов компании
+     * Получить вcе IP LDAP
      */
 
-    public Response findAllBySort(SortDto dto, String token) {
+    public Response findAllBySort(SortDto dto) {
         try {
             if (dto.getSort().isEmpty()){
                 return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll());
@@ -52,12 +53,12 @@ public class AccessUsersCompanyService {
                         Sort.by(dto.getSort().getFirst().getField()).descending());
             }
 
-            Specification<WSUSer> spec = WSUSerSpecifications.deletedAtIsNull();
+            Specification<AllowedIp> spec = AllowedIpSpecifications.deletedAtIsNull();
 
             if (!dto.getSearch().isEmpty()) {
-                spec = spec.and(WSUSerSpecifications.search(dto.getSearch()));
+                spec = spec.and(AllowedIpSpecifications.search(dto.getSearch()));
 
-                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(pageRequest).getContent());
+                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(spec, pageRequest).getContent());
             }
 
             return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(pageRequest).getContent());
@@ -67,15 +68,16 @@ public class AccessUsersCompanyService {
     }
 
     /**
-     * Добавить нового админа компании
+     * Добавить IP LDAP
      */
 
-    public Response save(AccessUsersCompanyDto dto, String token) {
+    public Response save(AllowedIpDto dto) {
         try {
-            AccessUsersCompany accessUsersCompany = mapper.getMapper().map(dto, AccessUsersCompany.class);
-            accessUsersCompany.setCreatedAt(LocalDateTime.now());
+            AllowedIp allowedIp = mapper.getMapper().map(dto, AllowedIp.class);
+            allowedIp.setCreatedAt(LocalDateTime.now());
 
-            this.repository.save(accessUsersCompany);
+            System.out.println(allowedIp);
+            this.repository.save(allowedIp);
             return new Response(HttpStatus.CREATED.value(), "Успешно сохранено");
         } catch (Exception err) {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
@@ -83,22 +85,22 @@ public class AccessUsersCompanyService {
     }
 
     /**
-     * Изменить админа компании
+     * Изменить IP LDAP
      */
 
-    public Response saveEdit(Long id, AccessUsersCompanyDto dto, String token) {
+    public Response saveEdit(Long id, AllowedIpDto dto) {
         try {
-            Optional<AccessUsersCompany> current = this.repository.findById(id);
+            Optional<AllowedIp> current = this.repository.findById(id);
 
             if (current.isEmpty()) {
-                return new Response(HttpStatus.NOT_FOUND.value(), "Такого пользователя нет");
+                return new Response(HttpStatus.NOT_FOUND.value(), "Такой группы пользователей нет");
             }
 
-            AccessUsersCompany accessUsersCompany = current.get();
-            accessUsersCompany = mapper.getMapper().map(dto, AccessUsersCompany.class);
-            accessUsersCompany.setUpdatedAt(LocalDateTime.now());
+            AllowedIp allowedIp = current.get();
+            mapper.getMapper().map(dto, allowedIp);
+            allowedIp.setUpdatedAt(LocalDateTime.now());
 
-            this.repository.save(accessUsersCompany);
+            this.repository.save(allowedIp);
             return new Response(HttpStatus.OK.value(), "Успешно сохранено");
         } catch (Exception err) {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
@@ -106,37 +108,39 @@ public class AccessUsersCompanyService {
     }
 
     /**
-     * Удалить админа компании
+     * Удалить IP LDAP
      */
 
-    public Response deleteById(Long id, String token){
+    public Response deleteById(Long id){
         try {
-            Optional<AccessUsersCompany> current = this.repository.findById(id);
+            Optional<AllowedIp> current = this.repository.findById(id);
 
             if (current.isEmpty()){
-                return new Response(HttpStatus.NOT_FOUND.value(), "Такого средства связи нет");
+                return new Response(HttpStatus.NOT_FOUND.value(), "Такой группы пользователей нет");
             }
 
-            AccessUsersCompany accessUsersCompany = current.get();
+            AllowedIp allowedIp = current.get();
 
-            if (accessUsersCompany.getDeletedAt() != null){
-                accessUsersCompany.setDeletedAt(null);
-                accessUsersCompany.setUpdatedAt(LocalDateTime.now());
+            if (allowedIp.getDeletedAt() != null){
+                allowedIp.setDeletedAt(null);
+                allowedIp.setUpdatedAt(LocalDateTime.now());
             }else {
-                accessUsersCompany.setDeletedAt(LocalDateTime.now());
+                allowedIp.setDeletedAt(LocalDateTime.now());
             }
-            this.repository.save(accessUsersCompany);
+
+            this.repository.save(allowedIp);
             return new Response(HttpStatus.OK.value(), "Успешно удалено/востановлено");
         }catch (Exception err){
+            System.out.println(err.getMessage());
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
         }
     }
 
     /**
-     * Получить админа компании
+     * Получить IP LDAP
      */
 
-    public Response findById(Long id, String token){
+    public Response findById(Long id){
         try {
             return new ResponseData(HttpStatus.OK.value(),
                     "Успешно получено",
@@ -145,4 +149,5 @@ public class AccessUsersCompanyService {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
         }
     }
+
 }

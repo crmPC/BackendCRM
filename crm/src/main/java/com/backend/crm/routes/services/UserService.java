@@ -191,7 +191,7 @@ public class UserService {
 
             return new ResponseData<>(HttpStatus.OK.value(),
                     "Успешно получен",
-                    new ResponseUserInfo(user));
+                    user);
         } catch (Exception err) {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
         }
