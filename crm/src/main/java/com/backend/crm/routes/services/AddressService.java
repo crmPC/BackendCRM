@@ -2,13 +2,14 @@ package com.backend.crm.routes.services;
 
 import com.backend.crm.app.config.Mapper;
 import com.backend.crm.app.domain.TokenService;
+import com.backend.crm.app.domain.ValidateService;
 import com.backend.crm.app.models.response.types.Response;
 import com.backend.crm.app.models.response.types.ResponseData;
 import com.backend.crm.routes.DTOs.AddressDto;
 import com.backend.crm.routes.DTOs.SortDto;
 import com.backend.crm.routes.models.Address;
-import com.backend.crm.routes.models.Log;
-import com.backend.crm.routes.models.WSUSer;
+import com.backend.crm.routes.models.UserEntity;
+import com.backend.crm.routes.models.UserRole;
 import com.backend.crm.routes.repositories.AddressRepository;
 import com.backend.crm.routes.repositories.AddressSpecifications;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Optional;
 
 /**
@@ -34,7 +36,7 @@ public class AddressService {
 
     private final Mapper mapper;
 
-    //private final TokenService tokenService;
+    private final ValidateService authService;
 
     /**
      * Создать новый адрес
@@ -45,15 +47,19 @@ public class AddressService {
             if (dto == null){
                 return new Response(HttpStatus.NO_CONTENT.value(), "dto - пусто");
             }
-//
-//            if (!tokenService.validateToken(token)){
-//                return new Response(HttpStatus.UNAUTHORIZED.value(), "Время действия авторизации истекло");
-//            }
-//
-//            WSUSer user = userService.findWSUSerByIdForLogger(tokenService.getUserIdFromJWT(token));
-//
-//            Log log = new Log();
-//            log.setTime(LocalDateTime.now());
+
+            //Работа с токеном
+            UserEntity user = authService.validateTokenByToken(token);
+
+            if (user.equals(null)){
+                return new Response(HttpStatus.UNAUTHORIZED.value(), "Время действия токена истекло");
+            }
+
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.admin, UserRole.moderator), user)) {
+                return new Response(HttpStatus.FORBIDDEN.value(), "Нет доступа на выоление запроса");
+            }
+
+            //Выполнение запроса
 
             Address address = mapper.getMapper().map(dto, Address.class);
             address.setCreatedAt(LocalDateTime.now());

@@ -1,18 +1,16 @@
 package com.backend.crm.routes.services;
 
 import com.backend.crm.app.config.Mapper;
+import com.backend.crm.app.domain.TokenService;
+import com.backend.crm.app.domain.ValidateService;
 import com.backend.crm.app.models.response.types.Response;
 import com.backend.crm.app.models.response.types.ResponseData;
 import com.backend.crm.routes.DTOs.AccessUsersCompanyDto;
-import com.backend.crm.routes.DTOs.AllowedIpDto;
 import com.backend.crm.routes.DTOs.SortDto;
-import com.backend.crm.routes.models.AccessUsersCompany;
-import com.backend.crm.routes.models.Address;
-import com.backend.crm.routes.models.WSUSer;
+import com.backend.crm.routes.models.*;
 import com.backend.crm.routes.repositories.AccessUsersCompanyRepository;
 import com.backend.crm.routes.repositories.WSUSerSpecifications;
 import lombok.AllArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -20,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Optional;
 
 @Service
@@ -30,12 +29,27 @@ public class AccessUsersCompanyService {
 
     private final Mapper mapper;
 
+    private final ValidateService authService;
+
     /**
      * Получить всех адиминов компании
      */
 
     public Response findAllBySort(SortDto dto, String token) {
         try {
+            //Работа с токеном
+            UserEntity user = authService.validateTokenByToken(token);
+
+            if (user.equals(null)){
+                return new Response(HttpStatus.UNAUTHORIZED.value(), "Время действия токена истекло");
+            }
+
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.admin), user)) {
+                return new Response(HttpStatus.FORBIDDEN.value(), "Нет доступа на выоление запроса");
+            }
+
+            //Выполнение запроса
+
             if (dto.getSort().isEmpty()){
                 return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll());
             }
@@ -72,6 +86,19 @@ public class AccessUsersCompanyService {
 
     public Response save(AccessUsersCompanyDto dto, String token) {
         try {
+            //Работа с токеном
+            UserEntity user = authService.validateTokenByToken(token);
+
+            if (user.equals(null)){
+                return new Response(HttpStatus.UNAUTHORIZED.value(), "Время действия токена истекло");
+            }
+
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.admin), user)) {
+                return new Response(HttpStatus.FORBIDDEN.value(), "Нет доступа на выоление запроса");
+            }
+
+            //Выполнение запроса
+
             AccessUsersCompany accessUsersCompany = mapper.getMapper().map(dto, AccessUsersCompany.class);
             accessUsersCompany.setCreatedAt(LocalDateTime.now());
 
@@ -88,6 +115,19 @@ public class AccessUsersCompanyService {
 
     public Response saveEdit(Long id, AccessUsersCompanyDto dto, String token) {
         try {
+            //Работа с токеном
+            UserEntity user = authService.validateTokenByToken(token);
+
+            if (user.equals(null)){
+                return new Response(HttpStatus.UNAUTHORIZED.value(), "Время действия токена истекло");
+            }
+
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.admin), user)) {
+                return new Response(HttpStatus.FORBIDDEN.value(), "Нет доступа на выоление запроса");
+            }
+
+            //Выполнение запроса
+
             Optional<AccessUsersCompany> current = this.repository.findById(id);
 
             if (current.isEmpty()) {
@@ -95,7 +135,7 @@ public class AccessUsersCompanyService {
             }
 
             AccessUsersCompany accessUsersCompany = current.get();
-            accessUsersCompany = mapper.getMapper().map(dto, AccessUsersCompany.class);
+            mapper.getMapper().map(dto, AccessUsersCompany.class);
             accessUsersCompany.setUpdatedAt(LocalDateTime.now());
 
             this.repository.save(accessUsersCompany);
@@ -111,6 +151,19 @@ public class AccessUsersCompanyService {
 
     public Response deleteById(Long id, String token){
         try {
+            //Работа с токеном
+            UserEntity user = authService.validateTokenByToken(token);
+
+            if (user.equals(null)){
+                return new Response(HttpStatus.UNAUTHORIZED.value(), "Время действия токена истекло");
+            }
+
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.admin), user)) {
+                return new Response(HttpStatus.FORBIDDEN.value(), "Нет доступа на выоление запроса");
+            }
+
+            //Выполнение запроса
+
             Optional<AccessUsersCompany> current = this.repository.findById(id);
 
             if (current.isEmpty()){
@@ -138,6 +191,19 @@ public class AccessUsersCompanyService {
 
     public Response findById(Long id, String token){
         try {
+            //Работа с токеном
+            UserEntity user = authService.validateTokenByToken(token);
+
+            if (user.equals(null)){
+                return new Response(HttpStatus.UNAUTHORIZED.value(), "Время действия токена истекло");
+            }
+
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.admin), user)) {
+                return new Response(HttpStatus.FORBIDDEN.value(), "Нет доступа на выоление запроса");
+            }
+
+            //Выполнение запроса
+
             return new ResponseData(HttpStatus.OK.value(),
                     "Успешно получено",
                     this.repository.findById(id).get());

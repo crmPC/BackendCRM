@@ -183,9 +183,6 @@ public class UserService {
                 return new Response(HttpStatus.NO_CONTENT.value(), "id пользователя пустое");
             }
 
-            if (!this.tokenService.validateToken(Authorization)){
-                return new Response(HttpStatus.UNAUTHORIZED.value(), "Токен истек");
-            }
 
 //            UserEntity admin = this.repository.findById(this.tokenService.getUserIdFromJWT(Authorization)).get();
 //
@@ -257,6 +254,15 @@ public class UserService {
         }catch (Exception err){
             System.out.println(err.getMessage());
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+        }
+    }
+
+    public UserEntity getUserForAuth(Long id){
+        try {
+            return this.repository.findById(id).get();
+        }catch (Exception err){
+            System.out.println(err.getMessage());
+            return null;
         }
     }
 }

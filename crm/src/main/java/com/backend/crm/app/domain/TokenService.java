@@ -1,7 +1,9 @@
 package com.backend.crm.app.domain;
 
 import com.backend.crm.routes.models.UserEntity;
+import com.backend.crm.routes.models.UserRole;
 import com.backend.crm.routes.models.WSUSer;
+import com.backend.crm.routes.services.UserService;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -9,9 +11,11 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class TokenService {
+
     @Value("${app.jwtSecret}")
     private String jwtSecret;
 
