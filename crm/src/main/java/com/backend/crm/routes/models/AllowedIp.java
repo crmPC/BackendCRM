@@ -12,7 +12,7 @@ public class AllowedIp {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idAllowedIp;
 
-    @Column(columnDefinition = "INET")
+    @Column
     private String address;
 
     @Column

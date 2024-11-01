@@ -45,11 +45,11 @@ public class Company {
     @Column
     private String description;
 
-    @ManyToMany
-    private List<DomainMail> domainMail;
+    @ManyToOne
+    private DomainMail domainMail;
 
-    @ManyToMany
-    private List<OfficeEquip> officeequip;
+    @ManyToOne
+    private OfficeEquip officeequip;
 
     @Column
     private LocalDateTime createdAt;

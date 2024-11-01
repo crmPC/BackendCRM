@@ -45,9 +45,6 @@ public class OfficeEquip {
     private String model;
 
     @ManyToOne
-    private Company company;
-
-    @ManyToOne
     private OfficeEquipTypes officeequiptypes;
 
     @Column

@@ -8,6 +8,12 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
  * TODO: Сделать проверку токена
  */
 
+/**
+ * ## API для crm системы по учету организационной техники
+ *
+ * @author Горелов Дмитрий
+ */
+
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 public class CrmApplication {
 

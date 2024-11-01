@@ -36,8 +36,8 @@ public class DomainAd {
     @Column
     private Date updateDate;
 
-    @OneToOne
-    private Company company;
+//    @ManyToOne
+//    private Company company;
 
     @OneToOne
     private Task task;

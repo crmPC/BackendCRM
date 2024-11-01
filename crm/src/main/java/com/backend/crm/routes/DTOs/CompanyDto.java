@@ -28,7 +28,7 @@ public class CompanyDto {
 
     private String description;
 
-    private List<DomainMail> domainMail;
+    private DomainMail domainMail;
 
-    private List<OfficeEquip> officeequip;
+    private OfficeEquip officeequip;
 }

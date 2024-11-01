@@ -13,8 +13,8 @@ public class Log {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idLog;
 
-    @ManyToOne
-    private WSUSer wsuSer;
+//    @ManyToOne
+//    private WSUSer wsuSer;
 
     @Column
     private String action_type;
