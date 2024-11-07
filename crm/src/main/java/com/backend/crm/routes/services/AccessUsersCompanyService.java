@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -35,23 +36,23 @@ public class AccessUsersCompanyService {
      * Получить всех адиминов компании
      */
 
-    public Response findAllBySort(SortDto dto, String token) {
+    public ResponseEntity findAllBySort(SortDto dto, String token) {
         try {
             //Работа с токеном
             UserEntity user = authService.validateTokenByToken(token);
 
             if (user.equals(null)){
-                return new Response(HttpStatus.UNAUTHORIZED.value(), "Время действия токена истекло");
+                return new ResponseEntity("Время действия токена истекло", HttpStatus.UNAUTHORIZED);
             }
 
             if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.admin), user)) {
-                return new Response(HttpStatus.FORBIDDEN.value(), "Нет доступа на выоление запроса");
+                return new ResponseEntity("Нет доступа на выоление запроса", HttpStatus.FORBIDDEN);
             }
 
             //Выполнение запроса
 
             if (dto.getSort().isEmpty()){
-                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll());
+                return new ResponseEntity(this.repository.findAll(), HttpStatus.OK);
             }
 
             PageRequest pageRequest;
@@ -71,12 +72,12 @@ public class AccessUsersCompanyService {
             if (!dto.getSearch().isEmpty()) {
                 spec = spec.and(WSUSerSpecifications.search(dto.getSearch()));
 
-                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(pageRequest).getContent());
+                return new ResponseEntity(this.repository.findAll(pageRequest).getContent(), HttpStatus.OK);
             }
 
-            return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(pageRequest).getContent());
+            return new ResponseEntity(this.repository.findAll(pageRequest).getContent(), HttpStatus.OK);
         } catch (Exception err) {
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка на сервере");
         }
     }
 
@@ -84,17 +85,17 @@ public class AccessUsersCompanyService {
      * Добавить нового админа компании
      */
 
-    public Response save(AccessUsersCompanyDto dto, String token) {
+    public ResponseEntity save(AccessUsersCompanyDto dto, String token) {
         try {
             //Работа с токеном
             UserEntity user = authService.validateTokenByToken(token);
 
             if (user.equals(null)){
-                return new Response(HttpStatus.UNAUTHORIZED.value(), "Время действия токена истекло");
+                return new ResponseEntity("Время действия токена истекло", HttpStatus.UNAUTHORIZED);
             }
 
-            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.admin), user)) {
-                return new Response(HttpStatus.FORBIDDEN.value(), "Нет доступа на выоление запроса");
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin), user)) {
+                return new ResponseEntity("Нет доступа на выоление запроса", HttpStatus.FORBIDDEN);
             }
 
             //Выполнение запроса
@@ -103,9 +104,9 @@ public class AccessUsersCompanyService {
             accessUsersCompany.setCreatedAt(LocalDateTime.now());
 
             this.repository.save(accessUsersCompany);
-            return new Response(HttpStatus.CREATED.value(), "Успешно сохранено");
+            return new ResponseEntity("Успешно сохранено", HttpStatus.CREATED);
         } catch (Exception err) {
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+            return new ResponseEntity(err.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -113,17 +114,17 @@ public class AccessUsersCompanyService {
      * Изменить админа компании
      */
 
-    public Response saveEdit(Long id, AccessUsersCompanyDto dto, String token) {
+    public ResponseEntity saveEdit(Long id, AccessUsersCompanyDto dto, String token) {
         try {
             //Работа с токеном
             UserEntity user = authService.validateTokenByToken(token);
 
             if (user.equals(null)){
-                return new Response(HttpStatus.UNAUTHORIZED.value(), "Время действия токена истекло");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new Response(HttpStatus.UNAUTHORIZED.value(), "Время действия токена истекло"));
             }
 
-            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.admin), user)) {
-                return new Response(HttpStatus.FORBIDDEN.value(), "Нет доступа на выоление запроса");
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin), user)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Response(HttpStatus.FORBIDDEN.value(), "Нет доступа на выоление запроса"));
             }
 
             //Выполнение запроса
@@ -131,7 +132,7 @@ public class AccessUsersCompanyService {
             Optional<AccessUsersCompany> current = this.repository.findById(id);
 
             if (current.isEmpty()) {
-                return new Response(HttpStatus.NOT_FOUND.value(), "Такого пользователя нет");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response(HttpStatus.NOT_FOUND.value(), "Такого пользователя нет"));
             }
 
             AccessUsersCompany accessUsersCompany = current.get();
@@ -139,9 +140,9 @@ public class AccessUsersCompanyService {
             accessUsersCompany.setUpdatedAt(LocalDateTime.now());
 
             this.repository.save(accessUsersCompany);
-            return new Response(HttpStatus.OK.value(), "Успешно сохранено");
+            return ResponseEntity.status(HttpStatus.OK).body(new Response(HttpStatus.OK.value(), "Успешно сохранено"));
         } catch (Exception err) {
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage()));
         }
     }
 
@@ -149,17 +150,17 @@ public class AccessUsersCompanyService {
      * Удалить админа компании
      */
 
-    public Response deleteById(Long id, String token){
+    public ResponseEntity deleteById(Long id, String token){
         try {
             //Работа с токеном
             UserEntity user = authService.validateTokenByToken(token);
 
             if (user.equals(null)){
-                return new Response(HttpStatus.UNAUTHORIZED.value(), "Время действия токена истекло");
+                return new ResponseEntity("Время действия токена истекло", HttpStatus.UNAUTHORIZED);
             }
 
-            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.admin), user)) {
-                return new Response(HttpStatus.FORBIDDEN.value(), "Нет доступа на выоление запроса");
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin), user)) {
+                return new ResponseEntity("Нет доступа на выоление запроса", HttpStatus.FORBIDDEN);
             }
 
             //Выполнение запроса
@@ -167,7 +168,7 @@ public class AccessUsersCompanyService {
             Optional<AccessUsersCompany> current = this.repository.findById(id);
 
             if (current.isEmpty()){
-                return new Response(HttpStatus.NOT_FOUND.value(), "Такого средства связи нет");
+                return new ResponseEntity("Такого средства связи нет", HttpStatus.NOT_FOUND);
             }
 
             AccessUsersCompany accessUsersCompany = current.get();
@@ -179,9 +180,9 @@ public class AccessUsersCompanyService {
                 accessUsersCompany.setDeletedAt(LocalDateTime.now());
             }
             this.repository.save(accessUsersCompany);
-            return new Response(HttpStatus.OK.value(), "Успешно удалено/востановлено");
+            return new ResponseEntity("Успешно удалено/востановлено", HttpStatus.OK);
         }catch (Exception err){
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+            return new ResponseEntity(err.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -189,26 +190,24 @@ public class AccessUsersCompanyService {
      * Получить админа компании
      */
 
-    public Response findById(Long id, String token){
+    public ResponseEntity findById(Long id, String token){
         try {
             //Работа с токеном
             UserEntity user = authService.validateTokenByToken(token);
 
             if (user.equals(null)){
-                return new Response(HttpStatus.UNAUTHORIZED.value(), "Время действия токена истекло");
+                return new ResponseEntity("Время действия токена истекло", HttpStatus.UNAUTHORIZED);
             }
 
-            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.admin), user)) {
-                return new Response(HttpStatus.FORBIDDEN.value(), "Нет доступа на выоление запроса");
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin), user)) {
+                return new ResponseEntity("Нет доступа на выоление запроса", HttpStatus.FORBIDDEN);
             }
 
             //Выполнение запроса
 
-            return new ResponseData(HttpStatus.OK.value(),
-                    "Успешно получено",
-                    this.repository.findById(id).get());
+            return new ResponseEntity(this.repository.findById(id).get(), HttpStatus.OK);
         }catch (Exception err){
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+            return new ResponseEntity(err.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

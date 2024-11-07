@@ -1,10 +1,7 @@
 package com.backend.crm.routes.services;
 
 import com.backend.crm.app.config.Mapper;
-import com.backend.crm.app.domain.TokenService;
 import com.backend.crm.app.domain.ValidateService;
-import com.backend.crm.app.models.response.types.Response;
-import com.backend.crm.app.models.response.types.ResponseData;
 import com.backend.crm.routes.DTOs.AddressDto;
 import com.backend.crm.routes.DTOs.SortDto;
 import com.backend.crm.routes.models.Address;
@@ -17,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -42,21 +40,21 @@ public class AddressService {
      * Создать новый адрес
      * */
 
-    public Response save(AddressDto dto, String token){
+    public ResponseEntity save(AddressDto dto, String token){
         try {
             if (dto == null){
-                return new Response(HttpStatus.NO_CONTENT.value(), "dto - пусто");
+                return new ResponseEntity("dto - пусто", HttpStatus.NO_CONTENT);
             }
 
             //Работа с токеном
             UserEntity user = authService.validateTokenByToken(token);
 
             if (user.equals(null)){
-                return new Response(HttpStatus.UNAUTHORIZED.value(), "Время действия токена истекло");
+                return new ResponseEntity("Время действия токена истекло", HttpStatus.UNAUTHORIZED);
             }
 
             if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.admin, UserRole.moderator), user)) {
-                return new Response(HttpStatus.FORBIDDEN.value(), "Нет доступа на выоление запроса");
+                return new ResponseEntity("Нет доступа на выоление запроса", HttpStatus.FORBIDDEN);
             }
 
             //Выполнение запроса
@@ -65,9 +63,9 @@ public class AddressService {
             address.setCreatedAt(LocalDateTime.now());
 
             this.repository.save(address);
-            return new Response(HttpStatus.CREATED.value(), "Адрес успешно сохранен");
+            return new ResponseEntity("Адрес успешно сохранен", HttpStatus.CREATED);
         }catch (Exception err){
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+            return new ResponseEntity(err.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -75,11 +73,24 @@ public class AddressService {
      * Получить все адреса с сортировкой постранично
      * */
 
-    public Response findAllBySort(SortDto dto){
+    public ResponseEntity findAllBySort(SortDto dto, String token){
         try {
             if (dto.getSort().isEmpty()){
-                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll());
+                return new ResponseEntity(this.repository.findAll(), HttpStatus.OK);
             }
+
+            //Работа с токеном
+            UserEntity user = authService.validateTokenByToken(token);
+
+            if (user.equals(null)){
+                return new ResponseEntity("Время действия токена истекло", HttpStatus.UNAUTHORIZED);
+            }
+
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.admin, UserRole.moderator), user)) {
+                return new ResponseEntity("Нет доступа на выоление запроса", HttpStatus.FORBIDDEN);
+            }
+
+            //Выполнение запроса
 
             PageRequest pageRequest;
             if (dto.getSort().getFirst().getSortDir().equals("asc")){
@@ -99,12 +110,12 @@ public class AddressService {
             if (!dto.getSearch().isEmpty()) {
                 spec = spec.and(AddressSpecifications.search(dto.getSearch()));
 
-                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(spec, pageRequest).getContent());
+                return new ResponseEntity(this.repository.findAll(pageRequest).getContent(), HttpStatus.OK);
             }
 
-            return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(pageRequest).getContent());
+            return new ResponseEntity(this.repository.findAll(pageRequest).getContent(), HttpStatus.OK);
         }catch (Exception err){
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка на сервере");
         }
     }
 
@@ -112,12 +123,25 @@ public class AddressService {
      * Изменить существующий адрес
      * */
 
-    public Response saveEdit(AddressDto dto, Long id){
+    public ResponseEntity saveEdit(AddressDto dto, Long id, String token){
         try {
+            //Работа с токеном
+            UserEntity user = authService.validateTokenByToken(token);
+
+            if (user.equals(null)){
+                return new ResponseEntity("Время действия токена истекло", HttpStatus.UNAUTHORIZED);
+            }
+
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.admin, UserRole.moderator), user)) {
+                return new ResponseEntity("Нет доступа на выоление запроса", HttpStatus.FORBIDDEN);
+            }
+
+            //Выполнение запроса
+
             this.repository.save(updateAddress(dto, id));
-            return new Response(HttpStatus.OK.value(), "Успешно сохранено");
+            return new ResponseEntity("Успешно сохранено", HttpStatus.OK);
         }catch (Exception err){
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка на сервере");
         }
     }
 
@@ -125,13 +149,24 @@ public class AddressService {
      * Получить адрес по id
      * */
 
-    public Response findById(Long id){
+    public ResponseEntity findById(Long id, String token){
         try {
-            return new ResponseData<>(HttpStatus.OK.value(),
-                    "Успешно получено",
-                    this.repository.findById(id).get());
+            //Работа с токеном
+            UserEntity user = authService.validateTokenByToken(token);
+
+            if (user.equals(null)){
+                return new ResponseEntity("Время действия токена истекло", HttpStatus.UNAUTHORIZED);
+            }
+
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.admin, UserRole.moderator), user)) {
+                return new ResponseEntity("Нет доступа на выоление запроса", HttpStatus.FORBIDDEN);
+            }
+
+            //Выполнение запроса
+
+            return new ResponseEntity(this.repository.findById(id).get(), HttpStatus.OK);
         }catch (Exception err){
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка на сервере");
         }
     }
 
@@ -139,12 +174,25 @@ public class AddressService {
      * Удалить адрес по id
      * */
 
-    public Response deleteById(Long id){
+    public ResponseEntity deleteById(Long id, String token){
         try {
+            //Работа с токеном
+            UserEntity user = authService.validateTokenByToken(token);
+
+            if (user.equals(null)){
+                return new ResponseEntity("Время действия токена истекло", HttpStatus.UNAUTHORIZED);
+            }
+
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.admin, UserRole.moderator), user)) {
+                return new ResponseEntity("Нет доступа на выоление запроса", HttpStatus.FORBIDDEN);
+            }
+
+            //Выполнение запроса
+
             Optional<Address> current = this.repository.findById(id);
 
             if (current.isEmpty()){
-                return new Response(HttpStatus.NOT_FOUND.value(), "Такого средства связи нет");
+                return new ResponseEntity("Такого средства связи нет", HttpStatus.NOT_FOUND);
             }
 
             Address address = current.get();
@@ -156,9 +204,9 @@ public class AddressService {
                 address.setDeletedAt(LocalDateTime.now());
             }
             this.repository.save(address);
-            return new Response(HttpStatus.OK.value(), "Успешно удалено/востановлено");
+            return new ResponseEntity("Успешно удалено/востановлено", HttpStatus.OK);
         }catch (Exception err){
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка на сервере");
         }
     }
 

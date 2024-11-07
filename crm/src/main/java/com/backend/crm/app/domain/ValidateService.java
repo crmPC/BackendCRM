@@ -2,6 +2,7 @@ package com.backend.crm.app.domain;
 
 import com.backend.crm.routes.models.UserEntity;
 import com.backend.crm.routes.models.UserRole;
+import com.backend.crm.routes.services.CompanyService;
 import com.backend.crm.routes.services.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,8 @@ public class ValidateService {
     private final TokenService tokenService;
 
     private final UserService userService;
+
+    private final CompanyService companyService;
 
     /**
      * Проверка доступа к запросу

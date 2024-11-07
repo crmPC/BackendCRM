@@ -1,14 +1,12 @@
 package com.backend.crm.routes.controllers;
 
-import com.backend.crm.app.models.response.types.Response;
 import com.backend.crm.routes.DTOs.AllowedIpDto;
 import com.backend.crm.routes.DTOs.SortDto;
-import com.backend.crm.routes.DTOs.WSUSerDto;
 import com.backend.crm.routes.services.AllowedIpService;
-import com.backend.crm.routes.services.WSUSerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "IP")
@@ -20,32 +18,32 @@ public class AllowedIpController {
     private final AllowedIpService service;
 
     @PostMapping("/all")
-    @Operation(summary = "Получить всех пользователей")
-    public Response findAllWSUSerBySort(@RequestBody SortDto sortDto){
-        return this.service.findAllBySort(sortDto);
+    @Operation(summary = "Получить ip")
+    public ResponseEntity findAllIPBySort(@RequestHeader("Authorization") String authorization, @RequestBody SortDto sortDto){
+        return this.service.findAllBySort(sortDto, authorization);
     }
 
     @PostMapping
-    @Operation(summary = "Добавить нового пользователя")
-    public Response saveWSUSer(@RequestBody AllowedIpDto dto){
-        return this.service.save(dto);
+    @Operation(summary = "Добавить ip")
+    public ResponseEntity saveIP(@RequestHeader("Authorization") String authorization, @RequestBody AllowedIpDto dto){
+        return this.service.save(dto, authorization);
     }
 
     @PutMapping
-    @Operation(summary = "Изменить пользователя")
-    public Response editWSUSer(@RequestParam("id") Long id, @RequestBody AllowedIpDto dto){
-        return this.service.saveEdit(id, dto);
+    @Operation(summary = "Изменить ip")
+    public ResponseEntity editIP(@RequestHeader("Authorization") String authorization, @RequestParam("id") Long id, @RequestBody AllowedIpDto dto){
+        return this.service.saveEdit(id, dto, authorization);
     }
 
     @DeleteMapping
-    @Operation(summary = "Удалить пользователя")
-    public Response deleteWSUSerById(@RequestParam Long id){
-        return this.service.deleteById(id);
+    @Operation(summary = "Удалить ip")
+    public ResponseEntity deleteIPById(@RequestHeader("Authorization") String authorization, @RequestParam Long id){
+        return this.service.deleteById(id, authorization);
     }
 
     @GetMapping
-    @Operation(summary = "Получить пользователя")
-    public Response findWSUSerById(@RequestParam Long id){
-        return this.service.findById(id);
+    @Operation(summary = "Получить ip")
+    public ResponseEntity findIPById(@RequestHeader("Authorization") String authorization, @RequestParam Long id){
+        return this.service.findById(id, authorization);
     }
 }

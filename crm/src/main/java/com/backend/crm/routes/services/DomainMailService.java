@@ -1,10 +1,13 @@
 package com.backend.crm.routes.services;
 
+import com.backend.crm.app.domain.ValidateService;
 import com.backend.crm.app.models.response.types.Response;
 import com.backend.crm.app.models.response.types.ResponseData;
 import com.backend.crm.routes.DTOs.DomainMailDto;
 import com.backend.crm.routes.DTOs.SortDto;
 import com.backend.crm.routes.models.DomainMail;
+import com.backend.crm.routes.models.UserEntity;
+import com.backend.crm.routes.models.UserRole;
 import com.backend.crm.routes.repositories.DomainMailRepository;
 import com.backend.crm.routes.repositories.DomainMailSpecifications;
 import lombok.RequiredArgsConstructor;
@@ -12,9 +15,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Optional;
 
 /**
@@ -28,15 +33,30 @@ import java.util.Optional;
 public class DomainMailService {
     private final DomainMailRepository repository;
 
+    private final ValidateService authService;
+
     /**
      * Получить все почты
      */
 
-    public Response findAllBySort(SortDto dto) {
+    public ResponseEntity findAllBySort(SortDto dto, String token) {
         try {
             if (dto.getSort().isEmpty()){
-                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll());
+                return new ResponseEntity(this.repository.findAll(), HttpStatus.NOT_FOUND);
             }
+
+            //Работа с токеном
+            UserEntity user = authService.validateTokenByToken(token);
+
+            if (user.equals(null)){
+                return new ResponseEntity("Время действия токена истекло", HttpStatus.UNAUTHORIZED);
+            }
+
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.moderator, UserRole.admin), user)) {
+                return new ResponseEntity("Нет доступа на выоление запроса", HttpStatus.FORBIDDEN);
+            }
+
+            //Выполнение запроса
 
             PageRequest pageRequest;
 
@@ -55,12 +75,13 @@ public class DomainMailService {
             if (!dto.getSearch().isEmpty()) {
                 spec = spec.and(DomainMailSpecifications.search(dto.getSearch()));
 
-                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(spec, pageRequest).getContent());
+                return new ResponseEntity(this.repository.findAll(pageRequest).getContent(), HttpStatus.OK);
             }
 
-            return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(pageRequest).getContent());
+            return new ResponseEntity(this.repository.findAll(pageRequest).getContent(), HttpStatus.OK);
         } catch (Exception err) {
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+            System.out.println(err.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка на сервере");
         }
     }
 
@@ -68,17 +89,31 @@ public class DomainMailService {
      * Добавить новую почту
      */
 
-    public Response save(DomainMailDto dto){
+    public ResponseEntity save(DomainMailDto dto, String token){
         try {
+            //Работа с токеном
+            UserEntity user = authService.validateTokenByToken(token);
+
+            if (user.equals(null)){
+                return new ResponseEntity("Время действия токена истекло", HttpStatus.UNAUTHORIZED);
+            }
+
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.moderator), user)) {
+                return new ResponseEntity("Нет доступа на выоление запроса", HttpStatus.FORBIDDEN);
+            }
+
+            //Выполнение запроса
+
             DomainMail domainMail = new DomainMail();
             domainMail.setCompany(dto.getCompany());
             domainMail.setName(dto.getName());
             domainMail.setCreatedAt(LocalDateTime.now());
 
             this.repository.save(domainMail);
-            return new Response(HttpStatus.CREATED.value(), "Успешно сохранено");
+            return new ResponseEntity("Успешно сохранено", HttpStatus.OK);
         }catch (Exception err){
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+            System.out.println(err.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка на сервере");
         }
     }
 
@@ -86,12 +121,25 @@ public class DomainMailService {
      * Изменить почту
      */
 
-    public Response saveEdit(Long id, DomainMailDto dto) {
+    public ResponseEntity saveEdit(Long id, DomainMailDto dto, String token) {
         try {
+            //Работа с токеном
+            UserEntity user = authService.validateTokenByToken(token);
+
+            if (user.equals(null)){
+                return new ResponseEntity("Время действия токена истекло", HttpStatus.UNAUTHORIZED);
+            }
+
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.moderator), user)) {
+                return new ResponseEntity("Нет доступа на выоление запроса", HttpStatus.FORBIDDEN);
+            }
+
+            //Выполнение запроса
+
             Optional<DomainMail> current = this.repository.findById(id);
 
             if (current.isEmpty()) {
-                return new Response(HttpStatus.NOT_FOUND.value(), "Такого средства связи не существует");
+                return new ResponseEntity("Такой почты не существует", HttpStatus.NOT_FOUND);
             }
 
             DomainMail domainMail = current.get();
@@ -100,9 +148,10 @@ public class DomainMailService {
             domainMail.setUpdatedAt(LocalDateTime.now());
 
             this.repository.save(domainMail);
-            return new Response(HttpStatus.OK.value(), "Успешно сохранено");
+            return new ResponseEntity("Успешно сохранено", HttpStatus.OK);
         } catch (Exception err) {
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+            System.out.println(err.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка на сервере");
         }
     }
 
@@ -110,12 +159,12 @@ public class DomainMailService {
      * Удалить почту
      */
 
-    public Response deleteById(Long id){
+    public ResponseEntity deleteById(Long id, String token){
         try {
             Optional<DomainMail> current = this.repository.findById(id);
 
             if (current.isEmpty()){
-                return new Response(HttpStatus.NOT_FOUND.value(), "Такого средства связи нет");
+                return new ResponseEntity("Такой почты не существует", HttpStatus.NOT_FOUND);
             }
 
             DomainMail domainMail = current.get();
@@ -128,10 +177,10 @@ public class DomainMailService {
             }
 
             this.repository.save(domainMail);
-            return new Response(HttpStatus.OK.value(), "Успешно удалено/востановлено");
+            return new ResponseEntity("Успешно удалено/востановлено", HttpStatus.OK);
         }catch (Exception err){
             System.out.println(err.getMessage());
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка на сервере");
         }
     }
 
@@ -139,13 +188,24 @@ public class DomainMailService {
      * Получить почту
      */
 
-    public Response findById(Long id){
+    public ResponseEntity findById(Long id, String token){
         try {
-            return new ResponseData(HttpStatus.OK.value(),
-                    "Успешно получено",
-                    this.repository.findById(id).get());
+            //Работа с токеном
+            UserEntity user = authService.validateTokenByToken(token);
+
+            if (user.equals(null)){
+                return new ResponseEntity("Время действия токена истекло", HttpStatus.UNAUTHORIZED);
+            }
+
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.moderator), user)) {
+                return new ResponseEntity("Нет доступа на выоление запроса", HttpStatus.FORBIDDEN);
+            }
+
+            //Выполнение запроса
+
+            return new ResponseEntity(this.repository.findById(id).get(), HttpStatus.OK);
         }catch (Exception err){
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка на сервере");
         }
     }
 }

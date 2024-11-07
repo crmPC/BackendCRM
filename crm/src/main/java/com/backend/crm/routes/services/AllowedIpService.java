@@ -1,11 +1,14 @@
 package com.backend.crm.routes.services;
 
 import com.backend.crm.app.config.Mapper;
+import com.backend.crm.app.domain.ValidateService;
 import com.backend.crm.app.models.response.types.Response;
 import com.backend.crm.app.models.response.types.ResponseData;
 import com.backend.crm.routes.DTOs.AllowedIpDto;
 import com.backend.crm.routes.DTOs.SortDto;
 import com.backend.crm.routes.models.AllowedIp;
+import com.backend.crm.routes.models.UserEntity;
+import com.backend.crm.routes.models.UserRole;
 import com.backend.crm.routes.repositories.AllowedIpRepository;
 import com.backend.crm.routes.repositories.AllowedIpSpecifications;
 import lombok.RequiredArgsConstructor;
@@ -13,9 +16,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Optional;
 
 /**
@@ -31,15 +36,30 @@ public class AllowedIpService {
 
     private final Mapper mapper;
 
+    private final ValidateService authService;
+
     /**
      * Получить вcе IP LDAP
      */
 
-    public Response findAllBySort(SortDto dto) {
+    public ResponseEntity findAllBySort(SortDto dto, String token) {
         try {
             if (dto.getSort().isEmpty()){
-                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll());
+                return new ResponseEntity(this.repository.findAll(), HttpStatus.NOT_FOUND);
             }
+
+            //Работа с токеном
+            UserEntity user = authService.validateTokenByToken(token);
+
+            if (user.equals(null)){
+                return new ResponseEntity("Время действия токена истекло", HttpStatus.UNAUTHORIZED);
+            }
+
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.admin, UserRole.moderator), user)) {
+                return new ResponseEntity("Нет доступа на выоление запроса", HttpStatus.FORBIDDEN);
+            }
+
+            //Выполнение запроса
 
             PageRequest pageRequest;
 
@@ -58,12 +78,12 @@ public class AllowedIpService {
             if (!dto.getSearch().isEmpty()) {
                 spec = spec.and(AllowedIpSpecifications.search(dto.getSearch()));
 
-                return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(spec, pageRequest).getContent());
+                return new ResponseEntity(this.repository.findAll(spec, pageRequest).getContent(), HttpStatus.OK);
             }
 
-            return new ResponseData<>(HttpStatus.OK.value(), "Успешно получено", this.repository.findAll(pageRequest).getContent());
+            return new ResponseEntity(this.repository.findAll(pageRequest).getContent(), HttpStatus.OK);
         } catch (Exception err) {
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка на сервере");
         }
     }
 
@@ -71,16 +91,29 @@ public class AllowedIpService {
      * Добавить IP LDAP
      */
 
-    public Response save(AllowedIpDto dto) {
+    public ResponseEntity save(AllowedIpDto dto, String token) {
         try {
+            //Работа с токеном
+            UserEntity user = authService.validateTokenByToken(token);
+
+            if (user.equals(null)){
+                return new ResponseEntity("Время действия токена истекло", HttpStatus.UNAUTHORIZED);
+            }
+
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.moderator), user)) {
+                return new ResponseEntity("Нет доступа на выоление запроса", HttpStatus.FORBIDDEN);
+            }
+
+            //Выполнение запроса
+
             AllowedIp allowedIp = mapper.getMapper().map(dto, AllowedIp.class);
             allowedIp.setCreatedAt(LocalDateTime.now());
 
             System.out.println(allowedIp);
             this.repository.save(allowedIp);
-            return new Response(HttpStatus.CREATED.value(), "Успешно сохранено");
+            return new ResponseEntity("Успешно сохранено", HttpStatus.CREATED);
         } catch (Exception err) {
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка на сервере");
         }
     }
 
@@ -88,12 +121,25 @@ public class AllowedIpService {
      * Изменить IP LDAP
      */
 
-    public Response saveEdit(Long id, AllowedIpDto dto) {
+    public ResponseEntity saveEdit(Long id, AllowedIpDto dto, String token) {
         try {
+            //Работа с токеном
+            UserEntity user = authService.validateTokenByToken(token);
+
+            if (user.equals(null)){
+                return new ResponseEntity("Время действия токена истекло", HttpStatus.UNAUTHORIZED);
+            }
+
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.moderator), user)) {
+                return new ResponseEntity("Нет доступа на выоление запроса", HttpStatus.FORBIDDEN);
+            }
+
+            //Выполнение запроса
+
             Optional<AllowedIp> current = this.repository.findById(id);
 
             if (current.isEmpty()) {
-                return new Response(HttpStatus.NOT_FOUND.value(), "Такой группы пользователей нет");
+                return new ResponseEntity("Такой группы пользователей нет", HttpStatus.NOT_FOUND);
             }
 
             AllowedIp allowedIp = current.get();
@@ -101,9 +147,9 @@ public class AllowedIpService {
             allowedIp.setUpdatedAt(LocalDateTime.now());
 
             this.repository.save(allowedIp);
-            return new Response(HttpStatus.OK.value(), "Успешно сохранено");
+            return new ResponseEntity("Успешно сохранено", HttpStatus.OK);
         } catch (Exception err) {
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка на сервере");
         }
     }
 
@@ -111,12 +157,25 @@ public class AllowedIpService {
      * Удалить IP LDAP
      */
 
-    public Response deleteById(Long id){
+    public ResponseEntity deleteById(Long id, String token){
         try {
+            //Работа с токеном
+            UserEntity user = authService.validateTokenByToken(token);
+
+            if (user.equals(null)){
+                return new ResponseEntity("Время действия токена истекло", HttpStatus.UNAUTHORIZED);
+            }
+
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.moderator), user)) {
+                return new ResponseEntity("Нет доступа на выоление запроса", HttpStatus.FORBIDDEN);
+            }
+
+            //Выполнение запроса
+
             Optional<AllowedIp> current = this.repository.findById(id);
 
             if (current.isEmpty()){
-                return new Response(HttpStatus.NOT_FOUND.value(), "Такой группы пользователей нет");
+                return new ResponseEntity("Такой группы пользователей нет", HttpStatus.NOT_FOUND);
             }
 
             AllowedIp allowedIp = current.get();
@@ -129,10 +188,10 @@ public class AllowedIpService {
             }
 
             this.repository.save(allowedIp);
-            return new Response(HttpStatus.OK.value(), "Успешно удалено/востановлено");
+            return new ResponseEntity("Успешно удалено/востановлено", HttpStatus.OK);
         }catch (Exception err){
             System.out.println(err.getMessage());
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка на сервере");
         }
     }
 
@@ -140,13 +199,24 @@ public class AllowedIpService {
      * Получить IP LDAP
      */
 
-    public Response findById(Long id){
+    public ResponseEntity findById(Long id, String token){
         try {
-            return new ResponseData(HttpStatus.OK.value(),
-                    "Успешно получено",
-                    this.repository.findById(id).get());
+            //Работа с токеном
+            UserEntity user = authService.validateTokenByToken(token);
+
+            if (user.equals(null)){
+                return new ResponseEntity("Время действия токена истекло", HttpStatus.UNAUTHORIZED);
+            }
+
+            if (!authService.checkAccess(Arrays.asList(UserRole.super_admin, UserRole.moderator), user)) {
+                return new ResponseEntity("Нет доступа на выоление запроса", HttpStatus.FORBIDDEN);
+            }
+
+            //Выполнение запроса
+
+            return new ResponseEntity(this.repository.findById(id).get(), HttpStatus.OK);
         }catch (Exception err){
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка на сервере");
         }
     }
 
